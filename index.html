@@ -282,7 +282,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 <!--  SCREEN: TITLE                                                      -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-title" class="screen active">
-  <img src="Red%20Rock%20Images/Town_Sign.jpg" alt="Red Rock Town Sign" style="height:130px;width:auto;margin-bottom:8px;display:block;filter:drop-shadow(3px 3px 12px rgba(0,0,0,.75))">
+  <img src="images/Town_Sign.jpg" alt="Red Rock Town Sign" style="height:130px;width:auto;margin-bottom:8px;display:block;filter:drop-shadow(3px 3px 12px rgba(0,0,0,.75))">
   <h1 class="gtitle">Sheriff's Spreadsheet:<br>Law &amp; Order in Red Rock Town</h1>
   <p class="title-sub">A Wild West Excel Adventure &nbsp;|&nbsp; Finance / Excel Learning Centre</p>
   <div class="obj-box">
@@ -560,7 +560,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 <!--  SCREEN: VICTORY                                                    -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <div id="screen-victory" class="screen">
-  <img class="vic-bg-img" src="Red%20Rock%20Images/End_Scene.jpg" alt="">
+  <img class="vic-bg-img" src="images/End_Scene.jpg" alt="">
   <div class="vic-bg-overlay"></div>
   <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding:30px 16px;width:100%">
     <div class="vic-title">Red Rock Town is SAVED!</div>
@@ -870,14 +870,14 @@ function l1EvalFormula() {
 }
 
 const POSTER_PHOTOS = [
-  'Red%20Rock%20Images/Jesse_Blackwood.png',  // 0: Jesse Blackwood
-  'Red%20Rock%20Images/Rattlesnake_Rita.png', // 1: Rattlesnake Rita
-  'Red%20Rock%20Images/Dynamite_Dan.jpg',     // 2: Dynamite Dan
-  'Red%20Rock%20Images/Sue_Slater.jpg',       // 3: Sweet Sue Slater
-  'Red%20Rock%20Images/Bill_Bannon.jpg',      // 4: Big Bill Bannon
-  'Red%20Rock%20Images/Whiskey_Jack.jpg',     // 5: Whiskey Jack
-  'Red%20Rock%20Images/Cassidy_Kane.jpg',     // 6: Cassidy Kane
-  'Red%20Rock%20Images/Colt_McCreddy.png',    // 7: Colt McCready
+  'images/Jesse_Blackwood.png',  // 0: Jesse Blackwood
+  'images/Rattlesnake_Rita.png', // 1: Rattlesnake Rita
+  'images/Dynamite_Dan.jpg',     // 2: Dynamite Dan
+  'images/Sue_Slater.jpg',       // 3: Sweet Sue Slater
+  'images/Bill_Bannon.jpg',      // 4: Big Bill Bannon
+  'images/Whiskey_Jack.jpg',     // 5: Whiskey Jack
+  'images/Cassidy_Kane.jpg',     // 6: Cassidy Kane
+  'images/Colt_McCreddy.png',    // 7: Colt McCready
 ];
 
 function buildL1Posters() {
@@ -965,7 +965,7 @@ function showL1Results() {
     passed ? 'Next Level ➜' : 'Retry Level 1',
     passed ? () => playCinematic('l2_opening', () => { GS.currentLevel = 2; showCutscene(
       'Level 2 of 4','The Great Train Robbery Audit',
-      '<img src="Red%20Rock%20Images/Mayor_Office.jpg" alt="Level 2" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      '<img src="images/Mayor_Office.jpg" alt="Level 2" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
       `The railroad company has been hit hard. Gold shipments missing, payroll stolen, merchants left unpaid. Mayor Goldie needs the books audited before she can report to the Governor — and the records are a mess. Time to put your <strong>SUMIF</strong> and <strong>IF</strong> formulas to work.`,
       'Start Level 2 →',
       ()=>{initLevel2();showScreen('level2');}
@@ -1151,7 +1151,7 @@ function showL2Results() {
     [`✅ Formulas correct: ${L2.score}/11`,`${passed?'✅':'❌'} Win condition: 9 or more correct`],
     passed?'Next Level ➜':'Retry Level 2',
     passed?()=>showCutscene(
-      'Level 3 of 4','Saloon of Secrets: The Bounty Analysis','<img src="Red%20Rock%20Images/level_3.jpg" alt="Level 3" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      'Level 3 of 4','Saloon of Secrets: The Bounty Analysis','<img src="images/level_3.jpg" alt="Level 3" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
       `Your deputies have caught one of the gang members — <em>'Slippery' Sam Shuffler</em> — trying to fence stolen goods at the saloon. He's grinning like a coyote. <span style="color:var(--gold2)">"You ain't got nothin' on me, Sheriff."</span> But you've got the complete county bounty registry. Time to crunch the numbers on this outlaw.`,
       'Start Level 3 ➜',
       ()=>{GS.currentLevel=3;playCinematic('l3_opening',()=>{initLevel3();showScreen('level3');});}
@@ -1332,7 +1332,7 @@ function showL3Results() {
     [`✅ Formulas correct: ${L3.score}/6`,`${passed?'✅':'❌'} Win condition: 5 or more correct`],
     passed?'Next Level ➜':'Retry Level 3',
     passed?()=>showCutscene(
-      'Level 4 of 4','Showdown at Sunset: Territory Defence','<img src="Red%20Rock%20Images/Sunset_Showdown.jpg" alt="Showdown at Sunset" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      'Level 4 of 4','Showdown at Sunset: Territory Defence','<img src="images/Sunset_Showdown.jpg" alt="Showdown at Sunset" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
       `The interrogation worked — 'Slippery' Sam spilled everything. The Dusty Dollar Gang rides on Red Rock Town tonight. You climb the watchtower and survey every sector below. Deputy Dusty hands you the territory spreadsheet. <span style="color:var(--gold2)">"We've got the data, Sheriff — threats, civilians, deputies. We need formulas that tell us which sectors are critical before the sun goes down!"</span>`,
       'Start Level 4 ➜',
       ()=>{GS.currentLevel=4;playCinematic('l4_opening',()=>{initLevel4();showScreen('level4');});}
@@ -1647,26 +1647,26 @@ function showFeedback(id, type, msg) {
    CINEMATIC SYSTEM
 ═══════════════════════════════════════════════════════════════════ */
 const CIN_CHARS = {
-  sheriff:{ img:'Red%20Rock%20Images/Male_Sheriff.jpg',   name:'' },
-  dusty:  { img:'Red%20Rock%20Images/Female_sheriff.jpg', name:'' },
-  mayor:  { img:'Red%20Rock%20Images/Mayor%20Goldie.png',  name:'Mayor Goldie'   },
-  sam:    { img:'Red%20Rock%20Images/Sam.png',            name:"'Slippery' Sam" },
+  sheriff:{ img:'images/Male_Sheriff.jpg',   name:'' },
+  dusty:  { img:'images/Female_sheriff.jpg', name:'' },
+  mayor:  { img:'images/Mayor%20Goldie.png',  name:'Mayor Goldie'   },
+  sam:    { img:'images/Sam.png',            name:"'Slippery' Sam" },
 };
 
 /* ── Backdrop images ───────────────────────────────────────────── */
 function _cinBg(type){
   const m={
-    day:         'Red%20Rock%20Images/Red%20Rock%20town.webp',
-    day2:        'Red%20Rock%20Images/RED%20Rock%20town%202.webp',
-    dusk:        'Red%20Rock%20Images/Red%20Rock%20town.webp',
-    saloon:      'Red%20Rock%20Images/saloon.webp',
-    saloon2:     'Red%20Rock%20Images/Saloon_cutscene.jpg',
-    sheriffs_office: 'Red%20Rock%20Images/Sheriffs_Office.jpg',
-    arrest_scene:'Red%20Rock%20Images/Arrest_Scene.jpg',
-    end_scene:   'Red%20Rock%20Images/End_Scene.jpg',
-    office:      'Red%20Rock%20Images/Mayor_Office.jpg',
-    sunset:      'Red%20Rock%20Images/Sunset_Showdown.jpg',
-    dusty_scene: 'Red%20Rock%20Images/Dusty_Scene.jpg',
+    day:         'images/Red%20Rock%20town.webp',
+    day2:        'images/RED%20Rock%20town%202.webp',
+    dusk:        'images/Red%20Rock%20town.webp',
+    saloon:      'images/saloon.webp',
+    saloon2:     'images/Saloon_cutscene.jpg',
+    sheriffs_office: 'images/Sheriffs_Office.jpg',
+    arrest_scene:'images/Arrest_Scene.jpg',
+    end_scene:   'images/End_Scene.jpg',
+    office:      'images/Mayor_Office.jpg',
+    sunset:      'images/Sunset_Showdown.jpg',
+    dusty_scene: 'images/Dusty_Scene.jpg',
   };
   const src=m[type]||m.day;
   const isDusk=type==='dusk';
@@ -1829,9 +1829,9 @@ function skipCinematic(){
    MUSIC — multi-track system with fade in/out and mute toggle
 ═══════════════════════════════════════════════════════════════════ */
 const _AUDIO_TRACKS = {
-  western:     new Audio('Red%20Rock%20Images/western_music.mp3'),
-  ghost_riders:new Audio('Red%20Rock%20Images/ghost-riders-vince-mcgill-main-version-33937-02-01.mp3'),
-  whiskey_bar: new Audio('Red%20Rock%20Images/whiskey-bar-ragtime-soundroll-main-version-33525-01-04.mp3'),
+  western:     new Audio('images/western_music.mp3'),
+  ghost_riders:new Audio('images/ghost-riders-vince-mcgill-main-version-33937-02-01.mp3'),
+  whiskey_bar: new Audio('images/whiskey-bar-ragtime-soundroll-main-version-33525-01-04.mp3'),
 };
 Object.values(_AUDIO_TRACKS).forEach(a => { a.loop = true; a.volume = 0; });
 
