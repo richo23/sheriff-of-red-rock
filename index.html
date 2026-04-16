@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sheriff's Spreadsheet: Law &amp; Order in Red Rock Town</title>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a0c06;--paper:#f5e4b8;--paper2:#e8d094;
+  --red:#8b1a1a;--red2:#5c0f0f;--gold:#c8960c;--gold2:#f0c040;
+  --brown:#3d1f0a;--tan:#c4a46a;--green:#2d5c1a;--text:#1a0c06;--r:6px;
+}
+body{background:var(--bg);color:var(--paper);font-family:'Playfair Display',Georgia,serif;min-height:100vh}
+.screen{display:none;flex-direction:column;min-height:100vh;align-items:center}
+.screen.active{display:flex}
+
+/* TITLE */
+#screen-title{background:linear-gradient(to bottom,#1a0c06 0%,#3d1508 40%,#8b3a0c 70%,#c4600a 88%,#f0a020 100%);justify-content:center;text-align:center;padding:40px 20px}
+h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(--gold2);text-shadow:3px 3px 0 var(--red2),6px 6px 12px rgba(0,0,0,.8);line-height:1.2;max-width:700px}
+.title-sub{font-size:1em;color:var(--tan);margin:12px 0 20px;font-style:italic}
+.title-badge{font-size:4.5em;margin-bottom:8px;display:block}
+.obj-box{background:rgba(0,0,0,.55);border:2px solid var(--gold);border-radius:var(--r);padding:18px 22px;max-width:580px;margin:16px auto 24px;text-align:left}
+.obj-box h3{font-family:'Rye',cursive;color:var(--gold2);margin-bottom:10px;text-align:center;font-size:.95em}
+.obj-box li{margin:5px 0;font-size:.85em;color:var(--paper2);line-height:1.4}
+
+/* BUTTONS */
+.btn{display:inline-block;font-family:'Rye',cursive;font-size:1em;padding:11px 28px;border:2px solid var(--gold);border-radius:var(--r);cursor:pointer;letter-spacing:1px;transition:all .18s}
+.btn-red{background:var(--red);color:var(--gold2);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.btn-red:hover{background:var(--red2);transform:translateY(-2px)}
+.btn-brown{background:var(--brown);color:var(--paper)}
+.btn-brown:hover{background:var(--red);color:var(--gold2)}
+.btn-green{background:var(--green);color:var(--gold2)}
+.btn-green:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* CUTSCENE */
+#screen-cutscene{background:linear-gradient(135deg,#1a0c06 0%,#2d1508 100%);justify-content:center;padding:40px 20px}
+.cs-card{background:rgba(0,0,0,.65);border:2px solid var(--gold);border-radius:var(--r);max-width:680px;width:100%;padding:28px;text-align:center}
+.cs-level{font-family:'Rye',cursive;color:var(--gold);font-size:.8em;letter-spacing:3px;margin-bottom:6px}
+.cs-title{font-family:'Rye',cursive;color:var(--gold2);font-size:1.7em;margin-bottom:16px}
+.cs-art{font-size:3.8em;margin:10px 0;line-height:1.5}
+.cs-text{font-style:italic;line-height:1.85;font-size:.95em;color:var(--paper2);text-align:left;margin-bottom:22px}
+
+/* LEVEL HEADER */
+.lvl-hdr{background:var(--red2);width:100%;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);flex-shrink:0}
+.lvl-hdr-title{font-family:'Rye',cursive;color:var(--gold2);font-size:1em}
+.lvl-score{color:var(--paper2);font-family:'Roboto Mono',monospace;font-size:.85em;white-space:nowrap}
+.pbar-wrap{flex:1;margin:0 14px;height:9px;background:rgba(0,0,0,.5);border-radius:5px;border:1px solid var(--gold)}
+.pbar-fill{height:100%;background:var(--gold2);border-radius:5px;transition:width .4s}
+
+/* PANELS */
+.gpanel{background:var(--paper);color:var(--text);border-radius:var(--r);padding:16px;margin:10px;max-width:900px;width:calc(100% - 20px)}
+.gpanel.dark{background:#2d1508;color:var(--paper);border:2px solid var(--gold)}
+.ptitle{font-family:'Rye',cursive;color:var(--red2);font-size:1em;margin-bottom:8px;border-bottom:2px solid var(--tan);padding-bottom:5px}
+.ptitle.light{color:var(--gold2);border-color:var(--gold)}
+
+/* DATA TABLE */
+.dtable{width:100%;border-collapse:collapse;font-family:'Roboto Mono',monospace;font-size:.73em}
+.dtable th{background:var(--red2);color:var(--gold2);padding:5px 7px;border:1px solid var(--brown);text-align:left}
+.dtable td{padding:3px 7px;border:1px solid var(--tan);background:#fff}
+.dtable tr:nth-child(even) td{background:#f9f3e3}
+.dtable td.rn{color:#aaa;border-right:2px solid var(--tan);font-size:.9em}
+
+/* FORMULA BUILDER */
+.fdisp{font-family:'Roboto Mono',monospace;font-size:.95em;background:#fff;border:2px solid var(--brown);border-radius:var(--r);padding:11px 14px;margin:8px 0;word-break:break-all;line-height:1.8}
+.fdisp .fn{color:#0055aa;font-weight:bold}
+.fdisp .fok{color:var(--green);font-weight:bold}
+.fdisp .fempty{color:#cc5500;font-style:italic}
+.fdisp .ffixed{color:#555}
+.argsec{margin:10px 0}
+.alabel{font-size:.82em;font-weight:bold;color:var(--brown);margin-bottom:5px}
+.alabel .hint{font-weight:normal;color:#666;font-style:italic}
+.opts{display:flex;flex-wrap:wrap;gap:5px}
+.ocard{padding:5px 11px;border:2px solid var(--tan);border-radius:4px;cursor:pointer;font-family:'Roboto Mono',monospace;font-size:.8em;background:#fff;color:var(--text);transition:all .14s}
+.ocard:hover{border-color:var(--gold);background:#fff8e0}
+.ocard.sel{border-color:var(--green);background:#e6f5e0;color:var(--green);font-weight:bold}
+.ocard.wrong{border-color:var(--red);background:#ffe0e0;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}33%{transform:translateX(-4px)}66%{transform:translateX(4px)}}
+
+/* TELEGRAM */
+.telegram{background:#faf0d2;border:2px solid var(--brown);border-radius:4px;padding:13px;margin-bottom:10px}
+.telegram::before{content:"📜 TELEGRAPH INCOMING";font-size:.68em;font-family:'Roboto Mono',monospace;color:var(--red2);font-weight:bold;letter-spacing:2px;display:block;margin-bottom:6px}
+.telegram-text{font-style:italic;line-height:1.65;color:var(--text);font-size:.92em}
+.telegram-text strong{color:var(--red2);font-style:normal}
+
+/* WANTED POSTER WALL */
+.poster-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.poster-slot{aspect-ratio:.75;border:2px dashed var(--tan);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:1.6em;background:#f9f0d0;transition:all .3s}
+.poster-slot.done{border:2px solid var(--gold);background:#fff8e0;animation:pop .3s}
+@keyframes pop{0%{transform:scale(.8)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+/* FEEDBACK */
+.feedback{padding:11px;border-radius:var(--r);margin:8px 0;font-size:.88em;line-height:1.5;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:#e6f5e0;border:2px solid var(--green);color:var(--green)}
+.feedback.bad{background:#ffe0e0;border:2px solid var(--red);color:var(--red)}
+
+/* INVESTIGATION BOARD */
+.inv-board{background:#2d1a0a;border:3px solid var(--brown);border-radius:var(--r);padding:12px;min-height:100px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;align-content:flex-start}
+.board-pin{background:#f9f0d0;color:var(--text);border:2px solid var(--gold);border-radius:3px;padding:7px 11px;font-family:'Roboto Mono',monospace;font-size:.78em;position:relative}
+.board-pin::before{content:"📌";position:absolute;top:-8px;left:8px;font-size:1em}
+.phase-tag{display:inline-block;background:var(--red);color:var(--gold2);font-family:'Rye',cursive;font-size:.75em;padding:3px 12px;border-radius:20px;margin-bottom:8px;letter-spacing:1px}
+
+/* PIVOT LEVEL */
+.pivot-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:600px){.pivot-wrap{grid-template-columns:1fr}}
+.pivot-zones-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pzone{min-height:80px;border:2px dashed var(--tan);border-radius:var(--r);padding:8px;background:rgba(255,255,255,.6);transition:border-color .2s,background .2s}
+.pzone.over{border-color:var(--gold);background:#fffbe8}
+.zone-hdr{font-size:.72em;font-weight:bold;color:var(--red2);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--tan);padding-bottom:3px}
+.field-bank{display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:rgba(255,255,255,.7);border:2px solid var(--tan);border-radius:var(--r);margin-bottom:8px}
+.fcard{display:inline-block;padding:5px 10px;border:2px solid var(--brown);border-radius:4px;background:#fff;font-family:'Roboto Mono',monospace;font-size:.78em;cursor:grab;user-select:none;transition:all .14s}
+.fcard:hover{border-color:var(--gold);background:#fff8e0;transform:translateY(-1px)}
+.fcard.placed{opacity:.35;cursor:not-allowed}
+.fcard.in-zone{border-color:var(--green);background:#e6f5e0;cursor:default}
+.fcard.in-zone::after{content:" ✕";color:var(--red);cursor:pointer;font-size:.9em}
+.outlaw-q{background:#2d1508;border:2px solid var(--gold);border-radius:8px;padding:13px;margin-bottom:10px;font-style:italic;color:var(--paper2);font-size:.9em;line-height:1.6}
+.outlaw-q::before{content:"🤠 Sam sneers:  ";color:var(--gold);font-weight:bold;font-style:normal}
+
+/* COND FORMATTING LEVEL */
+.sector-table{width:100%;border-collapse:collapse;font-family:'Roboto Mono',monospace;font-size:.75em}
+.sector-table th{background:var(--red2);color:var(--gold2);padding:5px 7px;border:1px solid var(--brown);text-align:center}
+.sector-table td{padding:4px 7px;border:1px solid var(--tan);background:#fff;text-align:center;transition:background .5s,color .5s}
+.rule-box{background:#fff8e0;border:2px solid var(--tan);border-radius:var(--r);padding:13px;margin-top:10px}
+.rule-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:7px 0}
+.rule-row label{font-size:.82em;font-weight:bold;color:var(--brown);min-width:140px}
+.rule-row select{padding:4px 8px;border:2px solid var(--tan);border-radius:4px;font-family:'Roboto Mono',monospace;font-size:.8em;background:#fff;cursor:pointer}
+.wave-hdr{display:inline-block;background:var(--red);color:var(--gold2);font-family:'Rye',cursive;padding:3px 14px;border-radius:20px;font-size:.82em;margin-bottom:8px}
+.defense-bar{height:22px;background:#333;border-radius:4px;margin-top:8px;overflow:hidden;border:2px solid var(--gold)}
+.defense-fill{height:100%;background:linear-gradient(90deg,var(--red) 0%,var(--gold) 50%,var(--green) 100%);border-radius:2px;transition:width .6s;display:flex;align-items:center;padding-left:6px;font-size:.75em;font-weight:bold;color:#fff}
+
+/* RESULTS */
+#screen-results{background:linear-gradient(135deg,var(--bg),#2d1508);justify-content:center;padding:40px 20px;text-align:center}
+.res-card{background:rgba(0,0,0,.65);border:3px solid var(--gold);border-radius:var(--r);max-width:580px;width:100%;padding:28px}
+.res-title{font-family:'Rye',cursive;color:var(--gold2);font-size:1.9em;margin-bottom:8px}
+.res-score{font-size:3em;margin:12px 0}
+.res-verdict{margin-bottom:18px;font-size:.95em}
+.res-breakdown{background:rgba(255,255,255,.1);border-radius:var(--r);padding:13px;text-align:left}
+.res-breakdown div{margin:5px 0;font-size:.88em}
+
+/* VICTORY */
+#screen-victory{position:relative;background:#1a0c06;justify-content:center;padding:40px 20px;text-align:center;overflow:hidden}
+#screen-victory .vic-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
+#screen-victory .vic-bg-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:1}
+#screen-victory>div{position:relative;z-index:2}
+.vic-badge{font-size:5em;animation:wiggle 1s ease-in-out;display:block;margin-bottom:8px}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.vic-title{font-family:'Rye',cursive;color:var(--gold2);font-size:clamp(1.5em,4vw,2.6em);text-shadow:3px 3px 0 var(--red2);margin-bottom:10px}
+.vic-narrative{background:rgba(0,0,0,.55);border:2px solid var(--gold);border-radius:var(--r);padding:18px;max-width:640px;margin:12px auto;font-style:italic;line-height:1.85;color:var(--paper2);text-align:left;font-size:.9em}
+.vic-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.stat-chip{background:rgba(0,0,0,.5);border:2px solid var(--gold);border-radius:var(--r);padding:10px 18px;text-align:center}
+.stat-val{font-family:'Rye',cursive;color:var(--gold2);font-size:1.3em}
+.stat-lbl{font-size:.72em;color:var(--tan);display:block}
+
+/* UTILS */
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.tc{text-align:center}.fr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.challenge-ctr{font-family:'Roboto Mono',monospace;font-size:.82em;color:var(--red2);margin-bottom:6px}
+.col-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.col-wrap{grid-template-columns:1fr}.poster-wall{grid-template-columns:repeat(4,1fr)}}
+/* ── Excel spreadsheet ──────────────────────────────────────────── */
+#l1-sheet-panel,#l2-sheet-panel,#l3-sheet-panel,#l4-sheet-panel{min-width:0}
+[id$="-xl-container"]{border:1px solid #bfbfbf;border-radius:2px;overflow:hidden;background:#fff;font-family:Calibri,Arial,sans-serif;font-size:11px}
+/* Formula bar */
+.xl-fbar{display:flex;align-items:stretch;height:26px;background:#f0f0f0;border-bottom:1px solid #bfbfbf}
+.xl-namebox{width:66px;border:none;border-right:2px solid #bfbfbf;padding:0 6px;font-family:Calibri,Arial,sans-serif;font-size:11px;text-align:center;background:#fff;flex-shrink:0;outline:none;color:#333}
+.xl-fxbtn{padding:0 8px 0 6px;color:#595959;font-style:italic;font-size:11px;display:flex;align-items:center;background:#f0f0f0;border-right:1px solid #d0d0d0;flex-shrink:0;user-select:none}
+.xl-formula-input{flex:1;border:none;padding:0 8px;font-family:Calibri,Arial,sans-serif;font-size:11px;background:#fff;outline:none;color:#1a1a1a}
+.xl-formula-input:focus{box-shadow:inset 0 0 0 2px rgba(31,115,183,.3)}
+.xl-formula-input::placeholder{color:#aaa;font-style:italic}
+/* Grid */
+.xl-grid{width:100%;border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:11px}
+.xl-corner{background:#f2f2f2;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;width:30px;min-width:30px}
+.xl-chdr{background:#f2f2f2;border:1px solid #d0d0d0;padding:2px 4px;text-align:center;font-weight:400;font-size:10.5px;color:#444;min-width:80px;user-select:none}
+.xl-rn{background:#f2f2f2;border:1px solid #d0d0d0;padding:2px 6px 2px 4px;text-align:right;font-size:10px;color:#555;width:30px;user-select:none}
+.xl-cell{border:1px solid #d0d0d0;padding:2px 7px;cursor:cell;background:#fff;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:Calibri,Arial,sans-serif;font-size:11px;color:#1a1a1a}
+.xl-cell.hrow{font-weight:700}
+.xl-row:nth-child(even) .xl-cell:not(.hrow){background:#f7f8f9}
+.xl-cell.xl-active{outline:2px solid #1F73B7;outline-offset:-1px;background:#E8F0FE!important;z-index:1;position:relative}
+.xl-rn.xl-active{background:#BFCFE9;color:#1F3864;font-weight:bold;border-color:#1F73B7}
+.xl-chdr.xl-active{background:#BFCFE9;color:#1F3864;font-weight:bold;border-color:#1F73B7}
+/* Result row */
+.xl-result-row .xl-rn{background:#e8e0f5}
+.xl-result-placeholder{color:#999;font-style:italic}
+.xl-result-ok{background:#d4edda!important;color:#155724!important;font-weight:bold;font-style:normal!important;outline:2px solid #28a745!important}
+.xl-result-err{background:#f8d7da!important;color:#721c24!important;font-weight:bold;font-style:normal!important;outline:2px solid #dc3545!important}
+/* Sheet tabs */
+.xl-tabs{display:flex;border-top:1px solid #bfbfbf;background:#ececec}
+.xl-tab{font-family:Calibri,Arial,sans-serif;font-size:10px;padding:3px 14px;cursor:default;color:#555;border-right:1px solid #d0d0d0}
+.xl-tab.active{background:#fff;color:#1F3864;font-weight:bold;border-top:2px solid #1F73B7;border-right:1px solid #bfbfbf;margin-top:-1px}
+/* Scroll container */
+#l1-xl-scroll,#l2-xl-scroll,#l3-xl-scroll,#l4-xl-scroll{overflow-x:auto;max-height:360px;overflow-y:auto}
+/* col widths */
+.col-wrap>.gpanel{min-width:0}
+.hidden{display:none!important}
+.drag-ghost{opacity:.45;cursor:grabbing}
+
+/* ═══ CINEMATIC OVERLAY ════════════════════════════════════════════ */
+#cin-overlay{position:fixed;inset:0;z-index:9000;display:none;flex-direction:column;background:#0a0604;overflow:hidden}
+#cin-overlay.cin-active{display:flex}
+#cin-bg-wrap{position:absolute;inset:0;overflow:hidden}
+#cin-bg-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* Characters no longer in cin-chars-wrap; wrap is unused */
+#cin-chars-wrap{display:none}
+/* Bottom bar: characters flank the dialogue box */
+#cin-dialogue{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:10px 14px 14px;
+  display:flex;flex-direction:row;align-items:flex-end;gap:10px;
+  background:linear-gradient(to top,rgba(0,0,0,.78) 0%,rgba(0,0,0,.18) 80%,transparent 100%);
+}
+#cin-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+/* Characters: in-flow, sized to match dialogue box height */
+.cin-char{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  transition:transform .65s cubic-bezier(.18,1,.28,1),opacity .45s;opacity:0;
+}
+.cin-left{transform:translateX(-90px)}
+.cin-right{transform:translateX(90px)}
+.cin-char.cin-entered{opacity:1;transform:translateX(0)!important}
+.cin-char.cin-talking{animation:cinBob .6s ease-in-out infinite}
+@keyframes cinBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* Character images: height matches the dialogue zone */
+.cin-char-img{
+  height:clamp(110px,19vh,190px);width:auto;max-width:clamp(70px,13vw,150px);
+  object-fit:contain;mix-blend-mode:multiply;
+  filter:drop-shadow(2px 6px 14px rgba(0,0,0,.95));display:block;
+}
+#cin-char-right .cin-char-img{transform:scaleX(-1)}
+.cin-char-name{
+  font-family:'Rye',cursive;font-size:.58em;color:var(--gold2);margin-top:3px;
+  text-shadow:1px 1px 4px rgba(0,0,0,1);white-space:nowrap;
+  background:rgba(0,0,0,.58);padding:2px 8px;border-radius:4px;
+}
+/* Dialogue bubble */
+#cin-bubble{
+  background:rgba(245,228,184,.97);border:3px solid var(--gold);border-radius:12px;
+  padding:10px 14px;width:100%;box-shadow:0 4px 22px rgba(0,0,0,.8);min-height:64px;
+}
+#cin-speaker{font-family:'Rye',cursive;font-size:.76em;color:var(--red2);display:block;margin-bottom:4px}
+#cin-text-out{font-size:.86em;color:var(--text);line-height:1.65;min-height:2em}
+.cin-cursor{display:inline-block;width:2px;height:.85em;background:var(--red2);vertical-align:middle;animation:cinBlink .7s step-end infinite;margin-left:1px}
+@keyframes cinBlink{50%{opacity:0}}
+#cin-actions{display:flex;gap:10px;width:100%;justify-content:flex-end}
+.cin-btn{font-family:'Rye',cursive;font-size:.82em;padding:7px 18px;border:2px solid var(--gold);border-radius:5px;cursor:pointer;letter-spacing:.5px;transition:all .15s}
+.cin-btn-go{background:var(--red);color:var(--gold2)}
+.cin-btn-go:hover{background:var(--red2);transform:translateY(-1px)}
+#cin-controls{position:absolute;top:11px;right:13px;z-index:9100;display:flex;gap:7px;align-items:center}
+#cin-skip,#cin-mute-btn{font-family:'Rye',cursive;font-size:.72em;background:rgba(0,0,0,.52);color:var(--tan);border:1px solid var(--tan);border-radius:4px;padding:4px 10px;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+#cin-skip:hover,#cin-mute-btn:hover{background:rgba(0,0,0,.78);color:var(--gold2);border-color:var(--gold)}
+#cin-mute-btn{font-family:inherit;font-size:.9em;padding:3px 9px;letter-spacing:0}
+/* WANTED POSTER WALL */
+.poster-wall{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:8px}
+@media(max-width:800px){.poster-wall{grid-template-columns:repeat(4,1fr)}}
+.poster-slot{aspect-ratio:.68;position:relative;border-radius:2px}
+.poster-blank{position:absolute;inset:0;border:2px dashed rgba(196,164,106,.4);border-radius:3px;display:flex;align-items:center;justify-content:center;background:#2a140a}
+.poster-blank span{font-size:1.6em;color:rgba(196,164,106,.28)}
+.poster-card{position:absolute;inset:0;display:none;flex-direction:column;border-radius:2px;background:linear-gradient(158deg,#f8edd5 0%,#efda9e 50%,#dfc07a 100%);border:2.5px solid #7a5020;overflow:hidden;box-shadow:2px 4px 14px rgba(0,0,0,.7)}
+.poster-card::before{content:'';position:absolute;inset:4px;border:1px solid rgba(80,30,5,.18);pointer-events:none;z-index:1;border-radius:1px}
+.poster-hdr{font-family:'Rye',cursive;font-size:clamp(.48em,.75vw,.82em);color:#8b0000;text-align:center;letter-spacing:2px;padding:4px 2px 3px;border-bottom:2px solid #8b0000;background:rgba(139,0,0,.07);line-height:1;flex-shrink:0}
+.poster-img-wrap{flex:1;overflow:hidden;display:flex;align-items:flex-start;justify-content:center;margin:3px 3px 0;background:#c4a46a;border:1px solid rgba(80,30,5,.25);min-height:0}
+.poster-photo{width:100%;height:100%;object-fit:cover;object-position:center top;filter:sepia(.22) contrast(1.1) brightness(.96)}
+.poster-sil{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.2em;background:#b8956a;color:rgba(90,40,10,.45)}
+.poster-info{padding:2px 3px 3px;text-align:center;line-height:1.2;flex-shrink:0}
+.poster-name{font-family:'Rye',cursive;font-size:clamp(.36em,.5vw,.58em);color:#1a0c06;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.poster-crime{font-size:clamp(.3em,.38vw,.48em);color:#5c0f0f;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.poster-bounty{font-size:clamp(.28em,.37vw,.46em);font-weight:bold;color:#1a0c06;border-top:1px solid rgba(122,80,32,.5);padding-top:1px;margin-top:1px}
+.poster-doa{position:absolute;right:-7px;bottom:24%;transform:rotate(38deg);transform-origin:center;font-family:'Rye',cursive;font-size:clamp(.22em,.3vw,.38em);color:#cc0000;border:1.5px solid #cc0000;padding:1px 4px;letter-spacing:1px;background:rgba(255,240,210,.85);line-height:1.3;text-align:center;opacity:.88;z-index:2}@keyframes posterReveal{from{transform:translateY(-18px) rotate(-5deg);opacity:0}to{transform:translateY(0) rotate(0);opacity:1}}
+@keyframes pop{0%{transform:scale(.8)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+#cin-fade{position:fixed;inset:0;z-index:8999;background:#0a0604;pointer-events:none;opacity:0;transition:opacity .55s}
+#cin-fade.cin-fade-in{opacity:1;pointer-events:all}
+/* Hide flanking character portraits in all cutscenes */
+.cin-char{display:none!important}
+@media(max-width:560px){.cin-char-img{height:55vh;max-width:28vw}#cin-bubble{padding:8px 12px}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: TITLE                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-title" class="screen active">
+  <img src="../../Red%20Rock%20images/Town_Sign.jpg" alt="Red Rock Town Sign" style="height:130px;width:auto;margin-bottom:8px;display:block;filter:drop-shadow(3px 3px 12px rgba(0,0,0,.75))">
+  <h1 class="gtitle">Sheriff's Spreadsheet:<br>Law &amp; Order in Red Rock Town</h1>
+  <p class="title-sub">A Wild West Excel Adventure &nbsp;|&nbsp; Finance / Excel Learning Centre</p>
+  <div class="obj-box">
+    <h3>⭐ Your Mission, Sheriff ⭐</h3>
+    <ul style="list-style:none;padding:0">
+      <li>🔍 <strong>Level 1</strong> — Track outlaws with <strong>VLOOKUP</strong></li>
+      <li>💰 <strong>Level 2</strong> — Audit losses with <strong>SUMIF &amp; IF statements</strong></li>
+      <li>🃏 <strong>Level 3</strong> — Interrogate data with <strong>Pivot Tables</strong></li>
+      <li>🌅 <strong>Level 4</strong> — Defend the town with <strong>Conditional Formatting</strong></li>
+    </ul>
+  </div>
+  <button class="btn btn-red" onclick="startGame()">🔫 Start Your Shift</button>
+  <p style="margin-top:16px;font-size:.78em;color:var(--tan);font-style:italic">Estimated playtime: ~52 minutes &nbsp;|&nbsp; Browser-based</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: CUTSCENE                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-cutscene" class="screen">
+  <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding:30px 16px;width:100%">
+    <div class="cs-card">
+      <div class="cs-level" id="cs-level-label"></div>
+      <div class="cs-title" id="cs-title"></div>
+      <div class="cs-art" id="cs-art"></div>
+      <div class="cs-text" id="cs-text"></div>
+      <button class="btn btn-red" id="cs-btn" onclick="cutsceneContinue()">Ride Out ➜</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: LEVEL 1 — VLOOKUP                                         -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-level1" class="screen">
+  <div class="lvl-hdr">
+    <span class="lvl-hdr-title">⭐ Level 1 — Wanted: Dead or VLOOKUP'd</span>
+    <div class="pbar-wrap"><div class="pbar-fill" id="l1-pbar" style="width:0%"></div></div>
+    <span class="lvl-score" id="l1-score-hdr">0 / 8</span>
+  </div>
+  <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+    <div class="col-wrap" style="align-items:start;gap:12px">
+      <!-- LEFT: Mission panel -->
+      <div class="gpanel" style="margin:0;width:100%">
+        <div class="challenge-ctr" id="l1-ctr">Challenge 1 of 8</div>
+        <div class="ptitle">📜 Incoming Telegraph</div>
+        <div class="telegram"><div class="telegram-text" id="l1-telegram"></div></div>
+        <div class="ptitle mt8">💡 Your Mission</div>
+        <p style="font-size:.84em;color:var(--red2);line-height:1.55;margin-bottom:6px">Type your <strong>VLOOKUP formula</strong> into the formula bar on the right, then press <strong>Enter</strong> to see the result.</p>
+        <p style="font-size:.78em;color:#666;line-height:1.5;margin-bottom:10px">Click any cell in the spreadsheet to see its reference in the Name Box. The formula result lands in row 12.</p>
+        <div class="feedback" id="l1-feedback"></div>
+        <div class="fr mt12">
+          <button class="btn btn-brown hidden" id="l1-next" onclick="l1Next()">Next Telegraph ➜</button>
+        </div>
+      </div>
+      <!-- RIGHT: Excel-like spreadsheet -->
+      <div id="l1-sheet-panel">
+        <div id="l1-xl-container">
+          <!-- Formula bar -->
+          <div class="xl-fbar">
+            <input class="xl-namebox" id="l1-namebox" value="A12" readonly>
+            <span class="xl-fxbtn">fx</span>
+            <input class="xl-formula-input" id="l1-formula-input" type="text"
+                   autocomplete="off" spellcheck="false"
+                   onkeydown="if(event.key==='Enter'){l1EvalFormula();event.preventDefault()}">
+          </div>
+          <!-- Grid -->
+          <div id="l1-xl-scroll">
+            <table class="xl-grid" id="l1-table"></table>
+          </div>
+          <!-- Sheet tabs -->
+          <div class="xl-tabs">
+            <div class="xl-tab active">Outlaw_Ledger</div>
+            <div class="xl-tab">Wanted_Posters</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Wanted Poster Wall — full width below split -->
+    <div class="gpanel dark" style="margin:0;width:100%">
+      <div class="ptitle light">🖼️ Wanted Poster Wall — Fill it up!</div>
+      <div class="poster-wall" id="l1-posters"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: LEVEL 2 — SUMIF + IF                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-level2" class="screen">
+  <div class="lvl-hdr">
+    <span class="lvl-hdr-title">⭐ Level 2 — The Great Train Robbery Audit</span>
+    <div class="pbar-wrap"><div class="pbar-fill" id="l2-pbar" style="width:0%"></div></div>
+    <span class="lvl-score" id="l2-score-hdr">0 / 11</span>
+  </div>
+  <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+    <div class="col-wrap" style="align-items:start;gap:12px">
+      <!-- LEFT: Mission panel -->
+      <div class="gpanel" style="margin:0;width:100%">
+        <div class="phase-tag" id="l2-phase-tag">Phase 1: SUMIF Roundup</div>
+        <div class="challenge-ctr" id="l2-ctr"></div>
+        <div class="ptitle">📜 Mayor's Ledger Request</div>
+        <div class="telegram"><div class="telegram-text" id="l2-telegram"></div></div>
+        <div class="ptitle mt8">💡 Your Mission</div>
+        <p style="font-size:.84em;color:var(--red2);line-height:1.55;margin-bottom:6px" id="l2-mission-text">Type your <strong>SUMIF formula</strong> into the formula bar on the right, then press <strong>Enter</strong> to see the result.</p>
+        <p style="font-size:.78em;color:#666;line-height:1.5;margin-bottom:10px">The formula result lands in row 12. Try again as many times as needed.</p>
+        <div class="feedback" id="l2-feedback"></div>
+        <div class="fr mt12">
+          <button class="btn btn-brown hidden" id="l2-next" onclick="l2Next()">Next Entry ➜</button>
+        </div>
+      </div>
+      <!-- RIGHT: Excel-like spreadsheet -->
+      <div id="l2-sheet-panel">
+        <div id="l2-xl-container">
+          <!-- Formula bar -->
+          <div class="xl-fbar">
+            <input class="xl-namebox" id="l2-namebox" value="A12" readonly>
+            <span class="xl-fxbtn">fx</span>
+            <input class="xl-formula-input" id="l2-formula-input" type="text"
+                   autocomplete="off" spellcheck="false"
+                   onkeydown="if(event.key==='Enter'){l2EvalFormula();event.preventDefault()}">
+          </div>
+          <!-- Grid -->
+          <div id="l2-xl-scroll">
+            <table class="xl-grid" id="l2-table"></table>
+          </div>
+          <!-- Sheet tabs -->
+          <div class="xl-tabs">
+            <div class="xl-tab active">Railroad_Loss_Registry</div>
+            <div class="xl-tab">Claims_Board</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Investigation Board — full width below split -->
+    <div class="gpanel dark" style="margin:0;width:100%">
+      <div class="ptitle light">🔎 Investigation Board</div>
+      <div class="inv-board" id="l2-board"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: LEVEL 3 — SUMIF / COUNTIF / AVERAGEIF                     -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-level3" class="screen">
+  <div class="lvl-hdr">
+    <span class="lvl-hdr-title">⭐ Level 3 — Saloon of Secrets: Bounty Analysis</span>
+    <div class="pbar-wrap"><div class="pbar-fill" id="l3-pbar" style="width:0%"></div></div>
+    <span class="lvl-score" id="l3-score-hdr">0 / 6</span>
+  </div>
+  <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+    <div class="col-wrap" style="align-items:start;gap:12px">
+      <!-- LEFT: Mission panel -->
+      <div class="gpanel" style="margin:0;width:100%">
+        <div class="challenge-ctr" id="l3-ctr">Round 1 of 6</div>
+        <div class="outlaw-q" id="l3-question"></div>
+        <div class="ptitle mt8">💡 Your Mission</div>
+        <p style="font-size:.84em;color:var(--red2);line-height:1.55;margin-bottom:6px" id="l3-mission-text">Type your formula into the formula bar on the right, then press <strong>Enter</strong> to see the result.</p>
+        <p style="font-size:.78em;color:#666;line-height:1.5;margin-bottom:10px">Use SUMIF, COUNTIF, or AVERAGEIF on the county bounty data. Result lands in row 12.</p>
+        <div class="feedback" id="l3-feedback"></div>
+        <div class="fr mt12">
+          <button class="btn btn-brown hidden" id="l3-next" onclick="l3Next()">Next Round ➜</button>
+        </div>
+      </div>
+      <!-- RIGHT: Excel-like spreadsheet -->
+      <div id="l3-sheet-panel">
+        <div id="l3-xl-container">
+          <!-- Formula bar -->
+          <div class="xl-fbar">
+            <input class="xl-namebox" id="l3-namebox" value="A12" readonly>
+            <span class="xl-fxbtn">fx</span>
+            <input class="xl-formula-input" id="l3-formula-input" type="text"
+                   autocomplete="off" spellcheck="false"
+                   onkeydown="if(event.key==='Enter'){l3EvalFormula();event.preventDefault()}">
+          </div>
+          <!-- Grid -->
+          <div id="l3-xl-scroll">
+            <table class="xl-grid" id="l3-table"></table>
+          </div>
+          <!-- Sheet tabs -->
+          <div class="xl-tabs">
+            <div class="xl-tab active">County_Bounty_Registry</div>
+            <div class="xl-tab">Analysis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Case Board — full width below split -->
+    <div class="gpanel dark" style="margin:0;width:100%">
+      <div class="ptitle light">🃏 Case Evidence Board</div>
+      <div class="inv-board" id="l3-board"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: LEVEL 4 — IF / AND / OR / COUNTIF                        -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-level4" class="screen">
+  <div class="lvl-hdr">
+    <span class="lvl-hdr-title">⭐ Level 4 — Showdown at Sunset: Territory Defence</span>
+    <div class="pbar-wrap"><div class="pbar-fill" id="l4-pbar" style="width:0%"></div></div>
+    <span class="lvl-score" id="l4-score-hdr">0 / 5</span>
+  </div>
+  <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+    <div class="col-wrap" style="align-items:start;gap:12px">
+      <!-- LEFT: Mission panel -->
+      <div class="gpanel" style="margin:0;width:100%">
+        <div class="wave-hdr" id="l4-wave-badge">Wave 1 of 5</div>
+        <div class="challenge-ctr" id="l4-ctr">Challenge 1 of 5</div>
+        <div class="ptitle">📜 Incoming Intel</div>
+        <div class="telegram"><div class="telegram-text" id="l4-telegram"></div></div>
+        <div class="ptitle mt8">💡 Your Mission</div>
+        <p style="font-size:.84em;color:var(--red2);line-height:1.55;margin-bottom:6px" id="l4-mission-text">Type your formula into the formula bar on the right, then press <strong>Enter</strong>.</p>
+        <p style="font-size:.78em;color:#666;line-height:1.5;margin-bottom:10px">Use IF, AND, OR, or COUNTIF on the territory data. Result lands in row 12.</p>
+        <div class="feedback" id="l4-feedback"></div>
+        <div class="fr mt12">
+          <button class="btn btn-brown hidden" id="l4-next" onclick="l4Next()">Next Wave ➜</button>
+        </div>
+        <div class="mt8">
+          <div style="font-size:.82em;color:#444;margin-bottom:4px">🏙️ Town Defence Score:</div>
+          <div class="defense-bar"><div class="defense-fill" id="l4-defense-fill" style="width:0%">0%</div></div>
+        </div>
+      </div>
+      <!-- RIGHT: Excel-like spreadsheet -->
+      <div id="l4-sheet-panel">
+        <div id="l4-xl-container">
+          <!-- Formula bar -->
+          <div class="xl-fbar">
+            <input class="xl-namebox" id="l4-namebox" value="A12" readonly>
+            <span class="xl-fxbtn">fx</span>
+            <input class="xl-formula-input" id="l4-formula-input" type="text"
+                   autocomplete="off" spellcheck="false"
+                   onkeydown="if(event.key==='Enter'){l4EvalFormula();event.preventDefault()}">
+          </div>
+          <!-- Grid -->
+          <div id="l4-xl-scroll">
+            <table class="xl-grid" id="l4-table"></table>
+          </div>
+          <!-- Sheet tabs -->
+          <div class="xl-tabs">
+            <div class="xl-tab active">Territory_Control_Map</div>
+            <div class="xl-tab">Defence_Rules</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Operations Board — full width below split -->
+    <div class="gpanel dark" style="margin:0;width:100%">
+      <div class="ptitle light">🌅 Defence Operations Board</div>
+      <div class="inv-board" id="l4-board"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: RESULTS                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding:30px 16px;width:100%">
+    <div class="res-card">
+      <div class="res-title" id="res-title"></div>
+      <div class="res-score" id="res-score"></div>
+      <div class="res-verdict" id="res-verdict"></div>
+      <div class="res-breakdown" id="res-breakdown"></div>
+      <div class="fr mt20" style="justify-content:center">
+        <button class="btn btn-red" id="res-continue" onclick="resultsContinue()">Continue ➜</button>
+        <button class="btn btn-brown" onclick="resultsRetry()" id="res-retry">↺ Try Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  SCREEN: VICTORY                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="screen-victory" class="screen">
+  <img class="vic-bg-img" src="../../Red%20Rock%20images/End_Scene.jpg" alt="">
+  <div class="vic-bg-overlay"></div>
+  <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding:30px 16px;width:100%">
+    <div class="vic-title">Red Rock Town is SAVED!</div>
+    <div class="vic-stats" id="vic-stats"></div>
+    <div class="fr mt16" style="justify-content:center;flex-wrap:wrap">
+      <div style="text-align:center;color:var(--gold2);font-family:'Rye',cursive;font-size:1.1em">🏅 Skills Unlocked: VLOOKUP &nbsp;·&nbsp; SUMIF &nbsp;·&nbsp; IF &nbsp;·&nbsp; Pivot Tables &nbsp;·&nbsp; Conditional Formatting</div>
+    </div>
+    <button class="btn btn-red mt20" onclick="location.reload()">🔫 Play Again</button>
+  </div>
+</div>
+
+<!-- ═══ CINEMATIC OVERLAY ══════════════════════════════════════════ -->
+<div id="cin-overlay">
+  <div id="cin-bg-wrap"></div>
+  <div id="cin-chars-wrap"></div><!-- kept for JS compatibility, hidden via CSS -->
+  <div id="cin-dialogue">
+    <!-- Left character flanks the bubble -->
+    <div class="cin-char cin-left" id="cin-char-left">
+      <img id="cin-l-img" class="cin-char-img" src="" alt="">
+      <div id="cin-l-name" class="cin-char-name"></div>
+    </div>
+    <!-- Centre: bubble + continue button -->
+    <div id="cin-center">
+      <div id="cin-bubble">
+        <span id="cin-speaker"></span>
+        <div id="cin-text-out"></div>
+      </div>
+      <div id="cin-actions">
+        <button class="cin-btn cin-btn-go" id="cin-next-btn" onclick="cinNext()" style="display:none">▶ Continue</button>
+      </div>
+    </div>
+    <!-- Right character flanks the bubble -->
+    <div class="cin-char cin-right" id="cin-char-right">
+      <img id="cin-r-img" class="cin-char-img" src="" alt="">
+      <div id="cin-r-name" class="cin-char-name"></div>
+    </div>
+  </div>
+  <div id="cin-controls">
+    <button id="cin-mute-btn" onclick="musMuteToggle()" title="Toggle music">🔊</button>
+    <button id="cin-skip" onclick="skipCinematic()">Skip ✕</button>
+  </div>
+</div>
+<div id="cin-fade"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════════════════════ */
+const GS = {
+  currentLevel: 0,
+  scores: [0, 0, 0, 0],
+  afterCutscene: null,
+  failedLevel: 0,
+  cinPlayed: new Set(),
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   START
+═══════════════════════════════════════════════════════════════════ */
+function startGame() {
+  playCinematic('opening', () => {
+    GS.currentLevel = 1;
+    initLevel1();
+    showScreen('level1');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CUTSCENE SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+function showCutscene(levelLabel, title, art, text, btnLabel, onContinue) {
+  document.getElementById('cs-level-label').textContent = levelLabel;
+  document.getElementById('cs-title').textContent = title;
+  document.getElementById('cs-art').innerHTML = art;
+  document.getElementById('cs-text').innerHTML = text;
+  document.getElementById('cs-btn').textContent = btnLabel;
+  GS.afterCutscene = onContinue;
+  showScreen('cutscene');
+}
+function cutsceneContinue() {
+  if (GS.afterCutscene) GS.afterCutscene();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL 1 — VLOOKUP
+═══════════════════════════════════════════════════════════════════ */
+const L1_DB = [
+  { name:'Jesse Blackwood', alias:'Black Jesse',    crime:'Bank Robbery',    hideout:"Dead Man's Canyon", bounty:500,  status:'Wanted'    },
+  { name:'Rattlesnake Rita', alias:'The Viper',      crime:'Train Robbery',   hideout:'Snake Creek',       bounty:750,  status:'Wanted'    },
+  { name:'Dynamite Dan',     alias:'Boom Dan',       crime:'Sabotage',        hideout:'Powder Ridge',      bounty:400,  status:'Wanted'    },
+  { name:'Sweet Sue Slater', alias:'Silver Sue',     crime:'Counterfeiting',  hideout:'Silvertown',        bounty:300,  status:'At Large'  },
+  { name:'Big Bill Bannon',  alias:'Bull Bannon',    crime:'Cattle Rustling', hideout:'Stampede Flats',    bounty:350,  status:'Wanted'    },
+  { name:'Whiskey Jack',     alias:'Wild Jack',      crime:'Murder',          hideout:"Devil's Pass",      bounty:1000, status:'Wanted'    },
+  { name:'Cassidy Kane',     alias:'Crazy Cassidy',  crime:'Stage Robbery',   hideout:'Boulder Bend',      bounty:600,  status:'At Large'  },
+  { name:'Colt McCready',    alias:'Two-Gun Colt',   crime:'Horse Theft',     hideout:'Dusty Gulch',       bounty:200,  status:'Captured'  },
+  { name:'Navajo Pete',      alias:'Desert Pete',    crime:'Armed Robbery',   hideout:'Red Mesa',          bounty:450,  status:'Wanted'    },
+  { name:'Belle Starling',   alias:'Black Belle',    crime:'Fraud',           hideout:'Frontier City',     bounty:250,  status:'Captured'  },
+];
+const L1_COLS = ['Name','Alias','Crime','Hideout','Bounty ($)','Status'];
+
+const L1_CHALLENGES = [
+  {
+    telegram: 'URGENT WIRE: <strong>Jesse Blackwood</strong> robbed the First National Bank. Retrieve his <strong>BOUNTY amount</strong> from the ledger.',
+    lookup: '"Jesse Blackwood"', lookupOpts: ['"Jesse Blackwood"','"Rattlesnake Rita"','A2','"Dynamite Dan"'],
+    col: '5', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 500, answerLabel: '$500',
+    poster: '🤠', explanation: 'Bounty is column 5. Use FALSE for an exact name match.',
+  },
+  {
+    telegram: 'RIDER REPORT: <strong>Rattlesnake Rita</strong> was spotted near the canyon. Where is her <strong>HIDEOUT</strong>?',
+    lookup: '"Rattlesnake Rita"', lookupOpts: ['"Rattlesnake Rita"','"Belle Starling"','"Whiskey Jack"','B2'],
+    col: '4', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'Snake Creek', answerLabel: 'Snake Creek',
+    poster: '🐍', explanation: 'Hideout is column 4. Exact match (FALSE) needed for name lookups.',
+  },
+  {
+    telegram: 'ALERT: <strong>Dynamite Dan</strong> threatened the mayor. Where is his <strong>HIDEOUT</strong>?',
+    lookup: '"Dynamite Dan"', lookupOpts: ['"Dynamite Dan"','"Cassidy Kane"','"Colt McCready"','D2'],
+    col: '4', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'Powder Ridge', answerLabel: 'Powder Ridge',
+    poster: '💣', explanation: 'Hideout is column 4.',
+  },
+  {
+    telegram: 'URGENT: <strong>Sweet Sue Slater</strong> has gone to ground. What is her current <strong>STATUS</strong>?',
+    lookup: '"Sweet Sue Slater"', lookupOpts: ['"Sweet Sue Slater"','"Belle Starling"','"Cassidy Kane"','F2'],
+    col: '6', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'At Large', answerLabel: 'At Large',
+    poster: '💃', explanation: 'Status is column 6.',
+  },
+  {
+    telegram: 'NEW WIRE: <strong>Big Bill Bannon</strong> struck the ranches again. What is his <strong>ALIAS</strong>?',
+    lookup: '"Big Bill Bannon"', lookupOpts: ['"Big Bill Bannon"','"Navajo Pete"','"Sweet Sue Slater"','E2'],
+    col: '2', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'Bull Bannon', answerLabel: 'Bull Bannon',
+    poster: '🐂', explanation: 'Alias is column 2.',
+  },
+  {
+    telegram: '<strong>Whiskey Jack</strong> was spotted at the saloon. What is his <strong>BOUNTY</strong>?',
+    lookup: '"Whiskey Jack"', lookupOpts: ['"Whiskey Jack"','"Colt McCready"','"Navajo Pete"','C2'],
+    col: '5', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 1000, answerLabel: '$1,000',
+    poster: '🥃', explanation: 'Bounty is column 5.',
+  },
+  {
+    telegram: '<strong>Cassidy Kane</strong> tried to skip town at dawn. What is her <strong>CRIME</strong>?',
+    lookup: '"Cassidy Kane"', lookupOpts: ['"Cassidy Kane"','"Belle Starling"','"Whiskey Jack"','H2'],
+    col: '3', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'Stage Robbery', answerLabel: 'Stage Robbery',
+    poster: '🏇', explanation: 'Crime is column 3.',
+  },
+  {
+    telegram: 'DEPUTY REPORT: <strong>Colt McCready</strong> has been dealt with. What is his current <strong>STATUS</strong>?',
+    lookup: '"Colt McCready"', lookupOpts: ['"Colt McCready"','"Jesse Blackwood"','"Dynamite Dan"','A2'],
+    col: '6', colOpts: ['1 — Name','2 — Alias','3 — Crime','4 — Hideout','5 — Bounty','6 — Status'],
+    range: 'FALSE', rangeOpts: ['FALSE (Exact match)','TRUE (Approximate)'],
+    answer: 'Captured', answerLabel: 'Captured',
+    poster: '🤠', explanation: 'Status is column 6.',
+  },
+];
+
+const L1 = { idx: 0, score: 0, activeCell: 'A12' };
+
+function initLevel1() {
+  L1.idx = 0; L1.score = 0; L1.activeCell = 'A12';
+  buildL1Table();
+  buildL1Posters();
+  loadL1Challenge();
+}
+
+function buildL1Table() {
+  const t = document.getElementById('l1-table');
+  const cols = ['A','B','C','D','E','F'];
+  const headers = ['Name','Alias','Crime','Hideout','Bounty ($)','Status'];
+
+  // Column-letter header row
+  let html = '<thead><tr><th class="xl-corner"></th>';
+  cols.forEach(c => html += `<th class="xl-chdr" id="xl-chdr-${c}">${c}</th>`);
+  html += '</tr></thead><tbody>';
+
+  // Row 1 — bold data-column headers
+  html += '<tr class="xl-row">';
+  html += '<td class="xl-rn" id="xl-rn-1">1</td>';
+  headers.forEach((h, i) => {
+    const ref = cols[i]+'1';
+    html += `<td class="xl-cell hrow" id="xl-${ref}" onclick="l1SelectCell('${ref}')">${h}</td>`;
+  });
+  html += '</tr>';
+
+  // Rows 2-11 — outlaw data
+  L1_DB.forEach((r, i) => {
+    const row = i + 2;
+    const vals = [r.name, r.alias, r.crime, r.hideout, r.bounty, r.status];
+    html += `<tr class="xl-row">`;
+    html += `<td class="xl-rn" id="xl-rn-${row}">${row}</td>`;
+    vals.forEach((v, ci) => {
+      const ref = cols[ci]+row;
+      html += `<td class="xl-cell" id="xl-${ref}" onclick="l1SelectCell('${ref}')">${v}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  // Row 12 — formula result row
+  html += `<tr class="xl-row xl-result-row">`;
+  html += `<td class="xl-rn" id="xl-rn-12">12</td>`;
+  html += `<td class="xl-cell xl-result-placeholder" id="xl-A12" colspan="6" onclick="l1SelectCell('A12');document.getElementById('l1-formula-input').focus()">← Type your formula in the bar above and press Enter</td>`;
+  html += '</tr>';
+
+  html += '</tbody>';
+  t.innerHTML = html;
+  l1SelectCell('A12');
+}
+
+function l1SelectCell(ref) {
+  // Clear previous highlights
+  document.querySelectorAll('#l1-table .xl-active').forEach(el => el.classList.remove('xl-active'));
+  L1.activeCell = ref;
+  const col = ref.match(/[A-F]/)?.[0];
+  const row = ref.match(/\d+/)?.[0];
+  document.getElementById('l1-namebox').value = ref;
+  const cell = document.getElementById('xl-'+ref);
+  if (cell) cell.classList.add('xl-active');
+  const rn = document.getElementById('xl-rn-'+row);
+  if (rn) rn.classList.add('xl-active');
+  const ch = document.getElementById('xl-chdr-'+col);
+  if (ch) ch.classList.add('xl-active');
+}
+
+function l1ParseAndEval(raw) {
+  let f = raw.trim().replace(/^=/, '');
+
+  // Detect IFERROR wrapper
+  let iferrFallback = null;
+  const iferrM = f.match(/^IFERROR\s*\(\s*(VLOOKUP\s*\([\s\S]+?\))\s*,\s*"([^"]*)"\s*\)$/i);
+  if (iferrM) { iferrFallback = iferrM[2]; f = iferrM[1]; }
+
+  // Parse VLOOKUP(lookup, range, col, match_type)
+  const vlM = f.match(/^VLOOKUP\s*\(\s*(.+?)\s*,\s*[A-Z]\d+:[A-Z]\d+\s*,\s*(\d+)\s*,\s*(FALSE|TRUE|0|1)\s*\)$/i);
+  if (!vlM) return { ok:false, display:'#FORMULA?', msg:'Check syntax — e.g. =VLOOKUP("Jesse Blackwood",A2:F11,5,FALSE)' };
+
+  let lookupVal = vlM[1].trim();
+  const colIdx  = parseInt(vlM[2]);
+  if (/^["']/.test(lookupVal) && /["']$/.test(lookupVal)) lookupVal = lookupVal.slice(1,-1);
+
+  const keys = ['name','alias','crime','hideout','bounty','status'];
+  if (colIdx < 1 || colIdx > 6) return { ok:false, display:'#REF!', msg:`col_index_num ${colIdx} is out of range — must be 1–6` };
+
+  const found = L1_DB.find(r => r.name.toLowerCase() === lookupVal.toLowerCase());
+  if (!found) {
+    if (iferrFallback !== null) return { ok:true, display:iferrFallback, value:iferrFallback };
+    return { ok:false, display:'#N/A', msg:`"${lookupVal}" not found. Wrap with IFERROR to handle missing names gracefully.` };
+  }
+
+  const rawVal = found[keys[colIdx-1]];
+  const display = keys[colIdx-1]==='bounty' ? `$${rawVal}` : String(rawVal);
+  return { ok:true, display, value:rawVal };
+}
+
+function l1EvalFormula() {
+  const inputEl = document.getElementById('l1-formula-input');
+  const formula = inputEl.value.trim();
+  if (!formula) { inputEl.focus(); return; }
+
+  const c  = L1_CHALLENGES[L1.idx];
+  const res = l1ParseAndEval(formula);
+  const rc  = document.getElementById('xl-A12');
+
+  if (!res.ok) {
+    rc.textContent = res.display;
+    rc.className = 'xl-cell xl-result-err xl-active';
+    showFeedback('l1-feedback','bad',`❌ ${res.display} — ${res.msg}`);
+    inputEl.focus();
+    updateL1Score();
+    return;
+  }
+
+  rc.textContent = res.display;
+  const correct = String(res.value).toLowerCase() === String(c.answer).toLowerCase();
+
+  if (correct) {
+    rc.className = 'xl-cell xl-result-ok xl-active';
+    const slot = document.getElementById(`poster-${L1.idx}`);
+    if (!slot?.classList.contains('done')) { L1.score++; l1RevealPoster(L1.idx); }
+    showFeedback('l1-feedback','ok',`✅ Correct! Formula returned: <strong>${res.display}</strong>. ${c.explanation}`);
+    inputEl.disabled = true;
+    document.getElementById('l1-next').classList.remove('hidden');
+  } else {
+    rc.className = 'xl-cell xl-result-err xl-active';
+    showFeedback('l1-feedback','bad',`❌ Returned <strong>${res.display}</strong> — not what was needed. Hint: ${c.explanation}`);
+    inputEl.value = '';
+    inputEl.focus();
+  }
+
+  updateL1Score();
+}
+
+const POSTER_PHOTOS = [
+  '../../Red%20Rock%20images/Jesse_Blackwood.png',  // 0: Jesse Blackwood
+  '../../Red%20Rock%20images/Rattlesnake_Rita.png', // 1: Rattlesnake Rita
+  '../../Red%20Rock%20images/Dynamite_Dan.jpg',     // 2: Dynamite Dan
+  '../../Red%20Rock%20images/Sue_Slater.jpg',       // 3: Sweet Sue Slater
+  '../../Red%20Rock%20images/Bill_Bannon.jpg',      // 4: Big Bill Bannon
+  '../../Red%20Rock%20images/Whiskey_Jack.jpg',     // 5: Whiskey Jack
+  '../../Red%20Rock%20images/Cassidy_Kane.jpg',     // 6: Cassidy Kane
+  '../../Red%20Rock%20images/Colt_McCreddy.png',    // 7: Colt McCready
+];
+
+function buildL1Posters() {
+  const w = document.getElementById('l1-posters');
+  w.innerHTML = L1_CHALLENGES.map((ch, i) => {
+    const db  = L1_DB[i];
+    const src = POSTER_PHOTOS[i];
+    const imgEl = src
+      ? `<img src="${src}" class="poster-photo" alt="${db.name}" style="width:100%;height:160px;object-fit:cover;object-position:top">`
+      : `<div class="poster-sil">👤</div>`;
+    return `<div class="poster-slot" id="poster-${i}">
+  <div class="poster-blank"><span>?</span></div>
+  <div class="poster-card">
+    <div class="poster-hdr">WANTED</div>
+    <div class="poster-img-wrap">${imgEl}</div>
+    <div class="poster-info">
+      <div class="poster-name">${db.name}</div>
+      <div class="poster-crime">${db.crime}</div>
+      <div class="poster-bounty">$${db.bounty} REWARD</div>
+    </div>
+    <div class="poster-doa">DEAD<br>OR<br>ALIVE</div>
+  </div>
+</div>`;
+  }).join('');
+}
+
+function l1RevealPoster(i) {
+  const slot = document.getElementById(`poster-${i}`);
+  if (!slot || slot.classList.contains('done')) return;
+  slot.classList.add('done');
+  slot.querySelector('.poster-blank').style.display = 'none';
+  const card = slot.querySelector('.poster-card');
+  card.style.display = 'flex';
+  card.style.animation = 'posterReveal .52s cubic-bezier(.18,1,.28,1) forwards';
+}
+
+function loadL1Challenge() {
+  if (L1.idx === 6 && !GS.cinPlayed.has('l1_final')) {
+    GS.cinPlayed.add('l1_final');
+    playCinematic('l1_final', loadL1Challenge);
+    return;
+  }
+  const c = L1_CHALLENGES[L1.idx];
+  document.getElementById('l1-ctr').textContent = `Challenge ${L1.idx+1} of 8`;
+  document.getElementById('l1-telegram').innerHTML = c.telegram;
+
+  // Reset formula bar and result cell
+  const inputEl = document.getElementById('l1-formula-input');
+  if (inputEl) { inputEl.value = ''; inputEl.disabled = false; }
+  const rc = document.getElementById('xl-A12');
+  if (rc) {
+    rc.textContent = '← Type your formula in the bar above and press Enter';
+    rc.className = 'xl-cell xl-result-placeholder xl-active';
+  }
+  l1SelectCell('A12');
+
+  // Reset feedback and buttons
+  const fb = document.getElementById('l1-feedback');
+  fb.className = 'feedback'; fb.innerHTML = '';
+  document.getElementById('l1-next').classList.add('hidden');
+
+  updateL1Score();
+  setTimeout(() => { const inp = document.getElementById('l1-formula-input'); if(inp) inp.focus(); }, 80);
+}
+
+function l1Next() {
+  L1.idx++;
+  if (L1.idx < L1_CHALLENGES.length) loadL1Challenge();
+  else showL1Results();
+}
+
+function updateL1Score() {
+  document.getElementById('l1-score-hdr').textContent = `${L1.score} / 8`;
+  document.getElementById('l1-pbar').style.width = `${(L1.idx / 8) * 100}%`;
+}
+
+function showL1Results() {
+  const passed = L1.score >= 6;
+  GS.scores[0] = L1.score;
+  showResultsScreen(
+    "Wanted: Dead or VLOOKUP'd",
+    `${L1.score} / 8`, passed,
+    passed ? '🏆 Outlaw wall complete! Red Rock is safer already, Sheriff.' : '💀 Not enough outlaws tracked. The town is in danger.',
+    [`✅ VLOOKUPs correct: ${L1.score} of 8`, `${passed?'✅':'❌'} Win condition: 6 or more correct`],
+    passed ? 'Next Level ➜' : 'Retry Level 1',
+    passed ? () => playCinematic('l2_opening', () => { GS.currentLevel = 2; showCutscene(
+      'Level 2 of 4','The Great Train Robbery Audit',
+      '<img src="../../Red%20Rock%20Images/Mayor_Office.jpg" alt="Level 2" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      `The railroad company has been hit hard. Gold shipments missing, payroll stolen, merchants left unpaid. Mayor Goldie needs the books audited before she can report to the Governor — and the records are a mess. Time to put your <strong>SUMIF</strong> and <strong>IF</strong> formulas to work.`,
+      'Start Level 2 →',
+      ()=>{initLevel2();showScreen('level2');}
+    ); })
+           : () => { initLevel1(); showScreen('level1'); },
+    1
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL 2 — SUMIF + IF  (spreadsheet edition)
+═══════════════════════════════════════════════════════════════════ */
+const L2_RECORDS = [
+  { merchant:'Red Rock Bank',    category:'Gold',     amount:5000,  region:'North', insured:'Yes' },
+  { merchant:'Pioneer Store',    category:'Supplies', amount:800,   region:'South', insured:'No'  },
+  { merchant:'Cattle Co.',       category:'Cattle',   amount:3200,  region:'East',  insured:'Yes' },
+  { merchant:'Railroad HQ',      category:'Payroll',  amount:12000, region:'North', insured:'Yes' },
+  { merchant:'Silver Mine',      category:'Gold',     amount:2500,  region:'West',  insured:'No'  },
+  { merchant:'General Store',    category:'Supplies', amount:450,   region:'South', insured:'No'  },
+  { merchant:"Rancher's Guild",  category:'Cattle',   amount:1800,  region:'East',  insured:'Yes' },
+  { merchant:'Saloon',           category:'Supplies', amount:300,   region:'West',  insured:'No'  },
+  { merchant:'Mining Co.',       category:'Gold',     amount:7500,  region:'North', insured:'Yes' },
+  { merchant:'Stage Depot',      category:'Payroll',  amount:2000,  region:'South', insured:'No'  },
+];
+
+const L2_CHALLENGES = [
+  // Phase 1: SUMIF (idx 0-4)
+  { phase:1, telegram:'Mayor Goldie needs the <strong>total losses for GOLD category</strong> to report to the governor.', answer:15000, explanation:'Criteria range = Category column (B). Sum range = Amount column (C). SUMIF sums C where B="Gold".', boardLabel:'💰 Gold losses: $15,000', hint:'=SUMIF(B2:B11,"Gold",C2:C11)' },
+  { phase:1, telegram:'Tally the <strong>total losses for SUPPLIES</strong> — shopkeepers are demanding answers.', answer:1550, explanation:'Sum all amounts where Category = "Supplies". Criteria range = B, sum range = C.', boardLabel:'🛒 Supplies losses: $1,550', hint:'=SUMIF(B2:B11,"Supplies",C2:C11)' },
+  { phase:1, telegram:'The governor asks: what are the <strong>total losses in the NORTH region</strong>?', answer:24500, explanation:'Criteria range = Region column (D). Criteria = "North". Sum range = C. Adds Red Rock Bank (5000) + Railroad HQ (12000) + Mining Co. (7500) = 24500.', boardLabel:'🧭 North losses: $24,500', hint:'=SUMIF(D2:D11,"North",C2:C11)' },
+  { phase:1, telegram:'Ranchers need compensation — total the <strong>CATTLE category losses</strong>.', answer:5000, explanation:'Category column (B) is the criteria range. Sum amounts in column C where B="Cattle".', boardLabel:'🐄 Cattle losses: $5,000', hint:'=SUMIF(B2:B11,"Cattle",C2:C11)' },
+  { phase:1, telegram:'Railroad workers need to be paid — total all <strong>PAYROLL category losses</strong> across the registry.', answer:14000, explanation:'Criteria range = Category column (B). Criteria = "Payroll". Sum range = C. Adds Railroad HQ (12000) + Stage Depot (2000) = 14000.', boardLabel:'💼 Payroll losses: $14,000', hint:'=SUMIF(B2:B11,"Payroll",C2:C11)' },
+  // Phase 2: IF (idx 5-10)
+  { phase:2, telegram:'Gold losses are <strong>$15,000</strong>. If losses exceed $10,000 → <strong>"File Claim"</strong>, otherwise → <strong>"No Claim"</strong>.', answer:'File Claim', explanation:'15000 > 10000 is TRUE, so the result is "File Claim".', boardLabel:'📋 Gold claim: FILE CLAIM', hint:'=IF(15000>10000,"File Claim","No Claim")' },
+  { phase:2, telegram:'Supplies losses are <strong>$1,550</strong>. If above $2,000 → <strong>"File Claim"</strong>, else → <strong>"No Claim"</strong>.', answer:'No Claim', explanation:'1550 > 2000 is FALSE, so result = "No Claim".', boardLabel:'📋 Supplies claim: NO CLAIM', hint:'=IF(1550>2000,"File Claim","No Claim")' },
+  { phase:2, telegram:'Railroad HQ lost <strong>$12,000</strong> in payroll. If above $10,000 → <strong>"Emergency Aid"</strong>, else → <strong>"Standard Aid"</strong>.', answer:'Emergency Aid', explanation:'12000 > 10000 is TRUE → "Emergency Aid".', boardLabel:'🚨 Railroad aid: EMERGENCY AID', hint:'=IF(12000>10000,"Emergency Aid","Standard Aid")' },
+  { phase:2, telegram:'North region losses total <strong>$24,500</strong>. If above $20,000 → <strong>"Release Funds"</strong>, else → <strong>"Hold Funds"</strong>.', answer:'Release Funds', explanation:'24500 > 20000 is TRUE → "Release Funds".', boardLabel:'💵 North region funds: RELEASE FUNDS', hint:'=IF(24500>20000,"Release Funds","Hold Funds")' },
+  { phase:2, telegram:'Cattle losses total <strong>$5,000</strong>. If above $3,000 → <strong>"Compensate"</strong>, else → <strong>"Deny"</strong>.', answer:'Compensate', explanation:'5000 > 3000 is TRUE → "Compensate".', boardLabel:'🐄 Cattle verdict: COMPENSATE', hint:'=IF(5000>3000,"Compensate","Deny")' },
+  { phase:2, telegram:'Total payroll losses across the registry are <strong>$14,000</strong>. If above $10,000 → <strong>"Emergency Aid"</strong>, else → <strong>"Standard Aid"</strong>.', answer:'Emergency Aid', explanation:'14000 > 10000 is TRUE → "Emergency Aid".', boardLabel:'💼 Payroll verdict: EMERGENCY AID', hint:'=IF(14000>10000,"Emergency Aid","Standard Aid")' },
+];
+
+const L2 = { idx:0, score:0, activeCell:'A12' };
+
+function initLevel2() {
+  L2.idx=0; L2.score=0; L2.activeCell='A12';
+  buildL2Table();
+  document.getElementById('l2-board').innerHTML='';
+  loadL2Challenge();
+}
+
+function buildL2Table() {
+  const t=document.getElementById('l2-table');
+  const cols=['A','B','C','D','E'];
+  const headers=['Merchant','Category','Amount ($)','Region','Insured'];
+  let html='<thead><tr><th class="xl-corner"></th>';
+  cols.forEach(c=>html+=`<th class="xl-chdr" id="l2-chdr-${c}">${c}</th>`);
+  html+='</tr></thead><tbody>';
+  html+='<tr class="xl-row"><td class="xl-rn" id="l2-rn-1">1</td>';
+  headers.forEach((h,i)=>html+=`<td class="xl-cell hrow" id="l2-${cols[i]}1">${h}</td>`);
+  html+='</tr>';
+  L2_RECORDS.forEach((r,i)=>{
+    const rn=i+2;
+    html+=`<tr class="xl-row"><td class="xl-rn" id="l2-rn-${rn}">${rn}</td>`;
+    const vals=[r.merchant,r.category,r.amount.toLocaleString(),r.region,r.insured];
+    vals.forEach((v,ci)=>html+=`<td class="xl-cell" id="l2-${cols[ci]}${rn}" onclick="l2SelectCell('${cols[ci]}${rn}')">${v}</td>`);
+    html+='</tr>';
+  });
+  html+=`<tr class="xl-row xl-result-row"><td class="xl-rn" id="l2-rn-12">12</td>`;
+  html+=`<td class="xl-cell xl-result-placeholder" id="l2-A12" colspan="5" onclick="l2SelectCell('A12');document.getElementById('l2-formula-input').focus()">← Type your formula above and press Enter</td>`;
+  html+='</tr></tbody>';
+  t.innerHTML=html;
+  l2SelectCell('A12');
+}
+
+function l2SelectCell(ref) {
+  document.querySelectorAll('#l2-table .xl-active').forEach(el=>el.classList.remove('xl-active'));
+  L2.activeCell=ref;
+  const col=ref.match(/[A-E]/)?.[0], row=ref.match(/\d+/)?.[0];
+  document.getElementById('l2-namebox').value=ref;
+  const cell=document.getElementById('l2-'+ref); if(cell) cell.classList.add('xl-active');
+  const rn=document.getElementById('l2-rn-'+row); if(rn) rn.classList.add('xl-active');
+  const ch=document.getElementById('l2-chdr-'+col); if(ch) ch.classList.add('xl-active');
+}
+
+function loadL2Challenge() {
+  if (L2.idx===10){ showL2Results(); return; }
+  if (L2.idx===9 && !GS.cinPlayed.has('l2_final')){
+    GS.cinPlayed.add('l2_final'); playCinematic('l2_final',loadL2Challenge); return;
+  }
+  const c=L2_CHALLENGES[L2.idx];
+  document.getElementById('l2-pbar').style.width=`${(L2.idx/11)*100}%`;
+  document.getElementById('l2-score-hdr').textContent=`${L2.score} / 11`;
+  document.getElementById('l2-phase-tag').textContent=c.phase===1?'Phase 1: SUMIF Roundup':'Phase 2: IF Statement Justice';
+  document.getElementById('l2-ctr').textContent=c.phase===1?`SUMIF Challenge ${L2.idx+1} of 5`:`IF Challenge ${L2.idx-4} of 6`;
+  document.getElementById('l2-telegram').innerHTML=c.telegram;
+  document.getElementById('l2-mission-text').innerHTML=c.phase===1
+    ?'Type your <strong>SUMIF formula</strong> into the formula bar on the right, then press <strong>Enter</strong>.'
+    :'Type your <strong>IF formula</strong> into the formula bar on the right, then press <strong>Enter</strong>.';
+  const inputEl=document.getElementById('l2-formula-input');
+  inputEl.value=''; inputEl.disabled=false;
+  const rc=document.getElementById('l2-A12');
+  rc.textContent='← Type your formula in the bar above and press Enter';
+  rc.className='xl-cell xl-result-placeholder xl-active';
+  l2SelectCell('A12');
+  const fb=document.getElementById('l2-feedback'); fb.className='feedback'; fb.innerHTML='';
+  document.getElementById('l2-next').classList.add('hidden');
+  document.getElementById('l2-score-hdr').textContent=`${L2.score} / 11`;
+  setTimeout(()=>{ const inp=document.getElementById('l2-formula-input'); if(inp) inp.focus(); },80);
+}
+
+function l2ParseAndEval(raw) {
+  let f=raw.trim().replace(/^=/,'').trim();
+  // SUMIF(criteria_range,"criteria",sum_range)
+  const sumifM=f.match(/^SUMIF\s*\(\s*([A-E]\d+:[A-E]\d+)\s*,\s*"([^"]*)"\s*,\s*([A-E]\d+:[A-E]\d+)\s*\)$/i);
+  if(sumifM){
+    const crC=sumifM[1][0].toUpperCase(), crit=sumifM[2].trim(), srC=sumifM[3][0].toUpperCase();
+    const m={A:'merchant',B:'category',C:'amount',D:'region',E:'insured'};
+    if(!m[crC]||!m[srC]) return{ok:false,display:'#REF!',msg:'Use columns A–E only.'};
+    let sum=0;
+    for(const r of L2_RECORDS){
+      if(String(r[m[crC]]).toLowerCase()===crit.toLowerCase()) sum+=parseFloat(r[m[srC]])||0;
+    }
+    return{ok:true,display:sum.toLocaleString(),value:sum};
+  }
+  // IF(number op number,"true","false")
+  const ifM=f.match(/^IF\s*\(\s*(-?\d+(?:\.\d+)?)\s*(>=|<=|<>|>|<|=)\s*(-?\d+(?:\.\d+)?)\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)$/i);
+  if(ifM){
+    const a=parseFloat(ifM[1]),op=ifM[2],b=parseFloat(ifM[3]),vt=ifM[4].trim(),vf=ifM[5].trim();
+    const cond={'>':a>b,'<':a<b,'>=':a>=b,'<=':a<=b,'=':a===b,'<>':a!==b}[op];
+    return{ok:true,display:cond?vt:vf,value:cond?vt:vf};
+  }
+  return{ok:false,display:'#FORMULA?',msg:'Try =SUMIF(B2:B11,"Gold",C2:C11) or =IF(15000>10000,"File Claim","No Claim")'};
+}
+
+function l2EvalFormula() {
+  const inputEl=document.getElementById('l2-formula-input');
+  const formula=inputEl.value.trim();
+  if(!formula){inputEl.focus();return;}
+  const c=L2_CHALLENGES[L2.idx];
+  const res=l2ParseAndEval(formula);
+  const rc=document.getElementById('l2-A12');
+  if(!res.ok){
+    rc.textContent=res.display; rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l2-feedback','bad',`❌ ${res.display} — ${res.msg}`);
+    inputEl.focus(); return;
+  }
+  rc.textContent=res.display;
+  const correct=typeof c.answer==='number'?res.value===c.answer:String(res.value).trim().toLowerCase()===String(c.answer).trim().toLowerCase();
+  if(correct){
+    rc.className='xl-cell xl-result-ok xl-active';
+    L2.score++;
+    const b=document.getElementById('l2-board');
+    const d=document.createElement('div'); d.className='board-pin';
+    d.innerHTML=`<strong>📌</strong> ${c.boardLabel}`; b.appendChild(d);
+    showFeedback('l2-feedback','ok',`✅ Correct! Formula returned <strong>${res.display}</strong>. ${c.explanation}`);
+    inputEl.disabled=true;
+    document.getElementById('l2-next').classList.remove('hidden');
+  } else {
+    rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l2-feedback','bad',`❌ Returned <strong>${res.display}</strong> — not the expected answer. Hint: ${c.explanation}`);
+    inputEl.value=''; inputEl.focus();
+  }
+  document.getElementById('l2-score-hdr').textContent=`${L2.score} / 11`;
+}
+
+function l2Next() {
+  /* Immediately clear result cell and formula input so no previous answer carries over */
+  const _rc=document.getElementById('l2-A12');
+  if(_rc){_rc.className='xl-cell xl-result-placeholder';_rc.textContent='';}
+  const _inp=document.getElementById('l2-formula-input');
+  if(_inp){_inp.value='';_inp.disabled=false;}
+  L2.idx++;
+  if(L2.idx>=11) showL2Results(); else loadL2Challenge();
+}
+
+function showL2Results() {
+  const passed=L2.score>=9;
+  GS.scores[1]=L2.score;
+  showResultsScreen(
+    'The Great Train Robbery Audit',
+    `${L2.score} / 11`, passed,
+    passed?'🏆 Audit complete! The governor will send aid.':'💀 Too many errors in the ledger. The audit fails.',
+    [`✅ Formulas correct: ${L2.score}/11`,`${passed?'✅':'❌'} Win condition: 9 or more correct`],
+    passed?'Next Level ➜':'Retry Level 2',
+    passed?()=>showCutscene(
+      'Level 3 of 4','Saloon of Secrets: The Bounty Analysis','<img src="../../Red%20Rock%20images/level_3.jpg" alt="Level 3" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      `Your deputies have caught one of the gang members — <em>'Slippery' Sam Shuffler</em> — trying to fence stolen goods at the saloon. He's grinning like a coyote. <span style="color:var(--gold2)">"You ain't got nothin' on me, Sheriff."</span> But you've got the complete county bounty registry. Time to crunch the numbers on this outlaw.`,
+      'Start Level 3 ➜',
+      ()=>{GS.currentLevel=3;playCinematic('l3_opening',()=>{initLevel3();showScreen('level3');});}
+    ):()=>{initLevel2();showScreen('level2');},
+    2
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL 3 — SUMIF / COUNTIF / AVERAGEIF  (bounty analysis)
+═══════════════════════════════════════════════════════════════════ */
+const L3_DB = [
+  {county:'Redwood',      outlaw:'Jesse Blackwood',  category:'Bank',    bounty:500,  status:'Wanted'  },
+  {county:'Dusty Gulch',  outlaw:'Rattlesnake Rita',  category:'Train',   bounty:750,  status:'Wanted'  },
+  {county:'Mesa Verde',   outlaw:'Dynamite Dan',      category:'Sabotage',bounty:400,  status:'Wanted'  },
+  {county:'Redwood',      outlaw:'Big Bill Bannon',   category:'Cattle',  bounty:350,  status:'Wanted'  },
+  {county:'Boulder Bend', outlaw:'Cassidy Kane',      category:'Stage',   bounty:600,  status:'At Large'},
+  {county:'Silver Flats', outlaw:'Whiskey Jack',      category:'Murder',  bounty:1000, status:'Wanted'  },
+  {county:'Mesa Verde',   outlaw:'Sweet Sue Slater',  category:'Fraud',   bounty:300,  status:'At Large'},
+  {county:'Dusty Gulch',  outlaw:'Navajo Pete',       category:'Armed',   bounty:450,  status:'Wanted'  },
+  {county:'Boulder Bend', outlaw:'Belle Starling',    category:'Fraud',   bounty:250,  status:'Captured'},
+  {county:'Silver Flats', outlaw:'Colt McCready',     category:'Horse',   bounty:200,  status:'Captured'},
+];
+
+const L3_CHALLENGES = [
+  { q:`"You'll never tally the bounties in Redwood County!" What is the total bounty for <strong>Redwood County</strong>?`, answer:850, explanation:'County is column A. Bounty is column D. SUMIF sums D where A="Redwood". 500+350=850.', boardLabel:'💰 Redwood County total: $850', hint:'=SUMIF(A2:A11,"Redwood",D2:D11)' },
+  { q:`"Ha! You don't know how many outlaws are WANTED!" Count all outlaws with status <strong>Wanted</strong>.`, answer:6, explanation:'Status is column E. COUNTIF counts rows where E="Wanted". 6 outlaws are listed as Wanted.', boardLabel:'📋 Wanted outlaws: 6', hint:'=COUNTIF(E2:E11,"Wanted")' },
+  { q:`"The Fraud Bureau wants totals — you can't calculate Fraud bounties!" Total bounty for the <strong>Fraud category</strong>.`, answer:550, explanation:'Category is column C. SUMIF sums column D where C="Fraud". 300+250=550.', boardLabel:'🕵️ Fraud total: $550', hint:'=SUMIF(C2:C11,"Fraud",D2:D11)' },
+  { q:`"You\'ll never find the AVERAGE bounty in Silver Flats!" What is the average bounty in <strong>Silver Flats</strong>?`, answer:600, explanation:'AVERAGEIF averages column D where A="Silver Flats". (1000+200)/2=600.', boardLabel:'📊 Silver Flats avg: $600', hint:'=AVERAGEIF(A2:A11,"Silver Flats",D2:D11)' },
+  { q:`"Count the outlaws in Mesa Verde — I dare you!" How many outlaws are in <strong>Mesa Verde</strong>?`, answer:2, explanation:'COUNTIF on column A counts records where county="Mesa Verde". 2 outlaws.', boardLabel:'🗺️ Mesa Verde count: 2', hint:'=COUNTIF(A2:A11,"Mesa Verde")' },
+  { q:`"Total all AT LARGE bounties — you can\'t!" What is the total bounty for all <strong>At Large</strong> outlaws?`, answer:900, explanation:'Status is column E. SUMIF sums D where E="At Large". 600+300=900.', boardLabel:'⚠️ At Large total: $900', hint:'=SUMIF(E2:E11,"At Large",D2:D11)' },
+];
+
+const L3 = {idx:0, score:0, activeCell:'A12'};
+
+function initLevel3() {
+  L3.idx=0; L3.score=0; L3.activeCell='A12';
+  buildL3Table();
+  document.getElementById('l3-board').innerHTML='';
+  loadL3Challenge();
+}
+
+function buildL3Table() {
+  const t=document.getElementById('l3-table');
+  const cols=['A','B','C','D','E'];
+  const headers=['County','Outlaw','Category','Bounty ($)','Status'];
+  let html='<thead><tr><th class="xl-corner"></th>';
+  cols.forEach(c=>html+=`<th class="xl-chdr" id="l3-chdr-${c}">${c}</th>`);
+  html+='</tr></thead><tbody>';
+  html+='<tr class="xl-row"><td class="xl-rn" id="l3-rn-1">1</td>';
+  headers.forEach((h,i)=>html+=`<td class="xl-cell hrow" id="l3-${cols[i]}1">${h}</td>`);
+  html+='</tr>';
+  L3_DB.forEach((r,i)=>{
+    const rn=i+2;
+    html+=`<tr class="xl-row"><td class="xl-rn" id="l3-rn-${rn}">${rn}</td>`;
+    const vals=[r.county,r.outlaw,r.category,r.bounty.toLocaleString(),r.status];
+    vals.forEach((v,ci)=>html+=`<td class="xl-cell" id="l3-${cols[ci]}${rn}" onclick="l3SelectCell('${cols[ci]}${rn}')">${v}</td>`);
+    html+='</tr>';
+  });
+  html+=`<tr class="xl-row xl-result-row"><td class="xl-rn" id="l3-rn-12">12</td>`;
+  html+=`<td class="xl-cell xl-result-placeholder" id="l3-A12" colspan="5" onclick="l3SelectCell('A12');document.getElementById('l3-formula-input').focus()">← Type your formula above and press Enter</td>`;
+  html+='</tr></tbody>';
+  t.innerHTML=html;
+  l3SelectCell('A12');
+}
+
+function l3SelectCell(ref) {
+  document.querySelectorAll('#l3-table .xl-active').forEach(el=>el.classList.remove('xl-active'));
+  L3.activeCell=ref;
+  const col=ref.match(/[A-E]/)?.[0], row=ref.match(/\d+/)?.[0];
+  document.getElementById('l3-namebox').value=ref;
+  const cell=document.getElementById('l3-'+ref); if(cell) cell.classList.add('xl-active');
+  const rn=document.getElementById('l3-rn-'+row); if(rn) rn.classList.add('xl-active');
+  const ch=document.getElementById('l3-chdr-'+col); if(ch) ch.classList.add('xl-active');
+}
+
+function loadL3Challenge() {
+  if(L3.idx===6){showL3Results();return;}
+  if(L3.idx===5 && !GS.cinPlayed.has('l3_final')){
+    GS.cinPlayed.add('l3_final'); playCinematic('l3_final',loadL3Challenge); return;
+  }
+  const c=L3_CHALLENGES[L3.idx];
+  document.getElementById('l3-ctr').textContent=`Round ${L3.idx+1} of 6`;
+  document.getElementById('l3-pbar').style.width=`${(L3.idx/6)*100}%`;
+  document.getElementById('l3-score-hdr').textContent=`${L3.score} / 6`;
+  document.getElementById('l3-question').innerHTML=c.q;
+  const inputEl=document.getElementById('l3-formula-input');
+  inputEl.value=''; inputEl.disabled=false;
+  const rc=document.getElementById('l3-A12');
+  rc.textContent='← Type your formula in the bar above and press Enter';
+  rc.className='xl-cell xl-result-placeholder xl-active';
+  l3SelectCell('A12');
+  const fb=document.getElementById('l3-feedback'); fb.className='feedback'; fb.innerHTML='';
+  document.getElementById('l3-next').classList.add('hidden');
+  setTimeout(()=>{ const inp=document.getElementById('l3-formula-input'); if(inp) inp.focus(); },80);
+}
+
+function l3ParseAndEval(raw) {
+  let f=raw.trim().replace(/^=/,'').trim();
+  const L3_COL={A:'county',B:'outlaw',C:'category',D:'bounty',E:'status'};
+  // SUMIF
+  const sumifM=f.match(/^SUMIF\s*\(\s*([A-E]\d+:[A-E]\d+)\s*,\s*"([^"]*)"\s*,\s*([A-E]\d+:[A-E]\d+)\s*\)$/i);
+  if(sumifM){
+    const crC=sumifM[1][0].toUpperCase(),crit=sumifM[2],srC=sumifM[3][0].toUpperCase();
+    if(!L3_COL[crC]||!L3_COL[srC]) return{ok:false,display:'#REF!',msg:'Use columns A–E only.'};
+    let sum=0;
+    for(const r of L3_DB){ if(String(r[L3_COL[crC]]).toLowerCase()===crit.toLowerCase()) sum+=parseFloat(r[L3_COL[srC]])||0; }
+    return{ok:true,display:sum.toLocaleString(),value:sum};
+  }
+  // COUNTIF
+  const countifM=f.match(/^COUNTIF\s*\(\s*([A-E]\d+:[A-E]\d+)\s*,\s*"([^"]*)"\s*\)$/i);
+  if(countifM){
+    const crC=countifM[1][0].toUpperCase(),crit=countifM[2];
+    if(!L3_COL[crC]) return{ok:false,display:'#REF!',msg:'Use columns A–E only.'};
+    let count=0;
+    for(const r of L3_DB){ if(String(r[L3_COL[crC]]).toLowerCase()===crit.toLowerCase()) count++; }
+    return{ok:true,display:String(count),value:count};
+  }
+  // AVERAGEIF
+  const avgifM=f.match(/^AVERAGEIF\s*\(\s*([A-E]\d+:[A-E]\d+)\s*,\s*"([^"]*)"\s*,\s*([A-E]\d+:[A-E]\d+)\s*\)$/i);
+  if(avgifM){
+    const crC=avgifM[1][0].toUpperCase(),crit=avgifM[2],srC=avgifM[3][0].toUpperCase();
+    if(!L3_COL[crC]||!L3_COL[srC]) return{ok:false,display:'#REF!',msg:'Use columns A–E only.'};
+    let sum=0,cnt=0;
+    for(const r of L3_DB){ if(String(r[L3_COL[crC]]).toLowerCase()===crit.toLowerCase()){sum+=parseFloat(r[L3_COL[srC]])||0;cnt++;} }
+    if(!cnt) return{ok:false,display:'#DIV/0!',msg:'No matching records found.'};
+    const avg=sum/cnt;
+    return{ok:true,display:avg%1===0?String(avg):avg.toFixed(2),value:avg};
+  }
+  return{ok:false,display:'#FORMULA?',msg:'Try =SUMIF(A2:A11,"Redwood",D2:D11), =COUNTIF(E2:E11,"Wanted"), or =AVERAGEIF(A2:A11,"Silver Flats",D2:D11)'};
+}
+
+function l3EvalFormula() {
+  const inputEl=document.getElementById('l3-formula-input');
+  const formula=inputEl.value.trim();
+  if(!formula){inputEl.focus();return;}
+  const c=L3_CHALLENGES[L3.idx];
+  const res=l3ParseAndEval(formula);
+  const rc=document.getElementById('l3-A12');
+  if(!res.ok){
+    rc.textContent=res.display; rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l3-feedback','bad',`❌ ${res.display} — ${res.msg}`);
+    inputEl.focus(); return;
+  }
+  rc.textContent=res.display;
+  const correct=typeof c.answer==='number'
+    ?(Math.abs(res.value-c.answer)<0.01)
+    :String(res.value).toLowerCase()===String(c.answer).toLowerCase();
+  if(correct){
+    rc.className='xl-cell xl-result-ok xl-active';
+    L3.score++;
+    const b=document.getElementById('l3-board');
+    const d=document.createElement('div'); d.className='board-pin';
+    d.innerHTML=`<strong>📌</strong> ${c.boardLabel}`; b.appendChild(d);
+    showFeedback('l3-feedback','ok',`✅ Sam sweats! Formula returned <strong>${res.display}</strong>. ${c.explanation}`);
+    inputEl.disabled=true;
+    document.getElementById('l3-next').classList.remove('hidden');
+  } else {
+    rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l3-feedback','bad',`❌ Returned <strong>${res.display}</strong> — not the expected answer. Hint: ${c.explanation}`);
+    inputEl.value=''; inputEl.focus();
+  }
+  document.getElementById('l3-score-hdr').textContent=`${L3.score} / 6`;
+}
+
+function l3Next() {
+  L3.idx++;
+  if(L3.idx>=6) showL3Results(); else loadL3Challenge();
+}
+
+function showL3Results() {
+  const passed=L3.score>=5;
+  GS.scores[2]=L3.score;
+  showResultsScreen(
+    'Saloon of Secrets: Bounty Analysis',
+    `${L3.score} / 6`, passed,
+    passed?`🏆 Sam cracks! He reveals the gang's master plan.`:`💀 Sam stays silent. You need more formula practice.`,
+    [`✅ Formulas correct: ${L3.score}/6`,`${passed?'✅':'❌'} Win condition: 5 or more correct`],
+    passed?'Next Level ➜':'Retry Level 3',
+    passed?()=>showCutscene(
+      'Level 4 of 4','Showdown at Sunset: Territory Defence','<img src="../../Red%20Rock%20images/Sunset_Showdown.jpg" alt="Showdown at Sunset" style="max-width:100%;max-height:220px;border-radius:6px;object-fit:cover;margin:4px auto;display:block">',
+      `The interrogation worked — 'Slippery' Sam spilled everything. The Dusty Dollar Gang rides on Red Rock Town tonight. You climb the watchtower and survey every sector below. Deputy Dusty hands you the territory spreadsheet. <span style="color:var(--gold2)">"We've got the data, Sheriff — threats, civilians, deputies. We need formulas that tell us which sectors are critical before the sun goes down!"</span>`,
+      'Start Level 4 ➜',
+      ()=>{GS.currentLevel=4;playCinematic('l4_opening',()=>{initLevel4();showScreen('level4');});}
+    ):()=>{initLevel3();showScreen('level3');},
+    3
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL 4 — IF / AND / OR / COUNTIF  (territory defence)
+═══════════════════════════════════════════════════════════════════ */
+const L4_DB = [
+  {sector:'A1', name:'Main St', threat:85, civilians:120, deputy:'No' },
+  {sector:'A2', name:'Bank',    threat:90, civilians:50,  deputy:'No' },
+  {sector:'B1', name:'Market',  threat:45, civilians:200, deputy:'Yes'},
+  {sector:'B2', name:'Saloon',  threat:70, civilians:30,  deputy:'No' },
+  {sector:'C1', name:'Mine',    threat:60, civilians:15,  deputy:'Yes'},
+  {sector:'C2', name:'Ranch',   threat:30, civilians:80,  deputy:'Yes'},
+  {sector:'D1', name:'Canyon',  threat:95, civilians:5,   deputy:'No' },
+  {sector:'D2', name:'Trail',   threat:55, civilians:10,  deputy:'No' },
+];
+
+const L4_CHALLENGES = [
+  { wave:'Wave 1 of 5', telegram:'Main St (row 2) has Threat=85. Write an IF: if Threat > 80 → <strong>"Critical"</strong>, otherwise → <strong>"Safe"</strong>.', answer:'Critical', hint:'=IF(C2>80,"Critical","Safe")', explanation:'C2 holds Main St threat (85). 85>80 is TRUE → "Critical".', boardLabel:'🚨 Main St: CRITICAL' },
+  { wave:'Wave 2 of 5', telegram:'Ranch (row 7) has Threat=30. Write IF: if Threat &lt; 40 → <strong>"Secure"</strong>, else → <strong>"Alert"</strong>.', answer:'Secure', hint:'=IF(C7<40,"Secure","Alert")', explanation:'C7 holds Ranch threat (30). 30<40 is TRUE → "Secure".', boardLabel:'✅ Ranch: SECURE' },
+  { wave:'Wave 3 of 5', telegram:'Canyon (row 8) has Threat=95 with no deputy. Write AND: TRUE if Threat&gt;90 <strong>AND</strong> Deputy="No".', answer:'TRUE', hint:'=AND(C8>90,E8="No")', explanation:'C8=95>90 is TRUE and E8="No" matches. AND(TRUE,TRUE)=TRUE.', boardLabel:'🔴 Canyon: AND conditions met' },
+  { wave:'Wave 4 of 5', telegram:'Market (row 4) OR Ranch (row 7): write OR returning TRUE if <strong>either</strong> sector has Threat &lt; 50.', answer:'TRUE', hint:'=OR(C4<50,C7<50)', explanation:'C4=45<50 is TRUE. OR(TRUE,...)=TRUE immediately.', boardLabel:'🟡 Market/Ranch: OR condition met' },
+  { wave:'Wave 5 of 5', telegram:'How many sectors have Threat <strong>above 60</strong>? Write COUNTIF on the Threat column.', answer:4, hint:'=COUNTIF(C2:C9,">60")', explanation:'Threats: 85,90,45,70,60,30,95,55 — four values exceed 60: 85, 90, 70, 95.', boardLabel:'📊 High-threat sectors: 4' },
+];
+
+const L4 = {idx:0, score:0, defense:0, activeCell:'A12'};
+
+function initLevel4() {
+  L4.idx=0; L4.score=0; L4.defense=0; L4.activeCell='A12';
+  buildL4Table();
+  document.getElementById('l4-board').innerHTML='';
+  loadL4Challenge();
+}
+
+function buildL4Table() {
+  const t=document.getElementById('l4-table');
+  const cols=['A','B','C','D','E'];
+  const headers=['Sector','Name','Threat','Civilians','Deputy'];
+  let html='<thead><tr><th class="xl-corner"></th>';
+  cols.forEach(c=>html+=`<th class="xl-chdr" id="l4-chdr-${c}">${c}</th>`);
+  html+='</tr></thead><tbody>';
+  html+='<tr class="xl-row"><td class="xl-rn" id="l4-rn-1">1</td>';
+  headers.forEach((h,i)=>html+=`<td class="xl-cell hrow" id="l4-${cols[i]}1">${h}</td>`);
+  html+='</tr>';
+  L4_DB.forEach((r,i)=>{
+    const rn=i+2;
+    html+=`<tr class="xl-row"><td class="xl-rn" id="l4-rn-${rn}">${rn}</td>`;
+    const vals=[r.sector,r.name,r.threat,r.civilians,r.deputy];
+    vals.forEach((v,ci)=>html+=`<td class="xl-cell" id="l4-${cols[ci]}${rn}" onclick="l4SelectCell('${cols[ci]}${rn}')">${v}</td>`);
+    html+='</tr>';
+  });
+  html+=`<tr class="xl-row xl-result-row"><td class="xl-rn" id="l4-rn-12">12</td>`;
+  html+=`<td class="xl-cell xl-result-placeholder" id="l4-A12" colspan="5" onclick="l4SelectCell('A12');document.getElementById('l4-formula-input').focus()">← Type your formula above and press Enter</td>`;
+  html+='</tr></tbody>';
+  t.innerHTML=html;
+  l4SelectCell('A12');
+}
+
+function l4SelectCell(ref) {
+  document.querySelectorAll('#l4-table .xl-active').forEach(el=>el.classList.remove('xl-active'));
+  L4.activeCell=ref;
+  const col=ref.match(/[A-E]/)?.[0], row=ref.match(/\d+/)?.[0];
+  document.getElementById('l4-namebox').value=ref;
+  const cell=document.getElementById('l4-'+ref); if(cell) cell.classList.add('xl-active');
+  const rn=document.getElementById('l4-rn-'+row); if(rn) rn.classList.add('xl-active');
+  const ch=document.getElementById('l4-chdr-'+col); if(ch) ch.classList.add('xl-active');
+}
+
+function loadL4Challenge() {
+  if(L4.idx===5){showL4Results();return;}
+  if(L4.idx===4 && !GS.cinPlayed.has('l4_final')){
+    GS.cinPlayed.add('l4_final'); playCinematic('l4_final',loadL4Challenge); return;
+  }
+  const c=L4_CHALLENGES[L4.idx];
+  document.getElementById('l4-wave-badge').textContent=c.wave;
+  document.getElementById('l4-ctr').textContent=`Challenge ${L4.idx+1} of 5`;
+  document.getElementById('l4-telegram').innerHTML=c.telegram;
+  document.getElementById('l4-mission-text').innerHTML='Type your formula into the formula bar on the right, then press <strong>Enter</strong>.';
+  const inputEl=document.getElementById('l4-formula-input');
+  inputEl.value=''; inputEl.disabled=false;
+  const rc=document.getElementById('l4-A12');
+  rc.textContent='← Type your formula in the bar above and press Enter';
+  rc.className='xl-cell xl-result-placeholder xl-active';
+  l4SelectCell('A12');
+  const fb=document.getElementById('l4-feedback'); fb.className='feedback'; fb.innerHTML='';
+  document.getElementById('l4-next').classList.add('hidden');
+  document.getElementById('l4-pbar').style.width=`${(L4.idx/5)*100}%`;
+  document.getElementById('l4-score-hdr').textContent=`${L4.score} / 5`;
+  setTimeout(()=>{ const inp=document.getElementById('l4-formula-input'); if(inp) inp.focus(); },80);
+}
+
+function l4ResolveCell(col,rowNum) {
+  const k={A:'sector',B:'name',C:'threat',D:'civilians',E:'deputy'}[col.toUpperCase()];
+  if(!k) return undefined;
+  const idx=rowNum-2; if(idx<0||idx>=L4_DB.length) return undefined;
+  return L4_DB[idx][k];
+}
+
+function l4EvalCondition(cond) {
+  const resolved=cond.replace(/\b([A-E])(\d+)\b/gi,(_,c,r)=>{
+    const v=l4ResolveCell(c,parseInt(r));
+    return(typeof v==='string')?`"${v}"`:(v===undefined?`${c}${r}`:String(v));
+  });
+  const numM=resolved.match(/^(-?\d+(?:\.\d+)?)\s*(>=|<=|<>|>|<|=)\s*(-?\d+(?:\.\d+)?)$/);
+  if(numM){const a=parseFloat(numM[1]),op=numM[2],b=parseFloat(numM[3]);return{'>':a>b,'<':a<b,'>=':a>=b,'<=':a<=b,'=':a===b,'<>':a!==b}[op];}
+  const strM=resolved.match(/^"([^"]*)"\s*(=|<>)\s*"([^"]*)"$/);
+  if(strM){const a=strM[1].toLowerCase(),op=strM[2],b=strM[3].toLowerCase();return op==='='?a===b:a!==b;}
+  return null;
+}
+
+function splitL4Args(str) {
+  const args=[]; let depth=0,cur='',inQ=false;
+  for(const ch of str){
+    if(ch==='"') inQ=!inQ;
+    if(!inQ&&ch==='(') depth++;
+    if(!inQ&&ch===')') depth--;
+    if(!inQ&&depth===0&&ch===','){args.push(cur);cur='';}else cur+=ch;
+  }
+  if(cur.trim()) args.push(cur);
+  return args;
+}
+
+function l4ParseAndEval(raw) {
+  let f=raw.trim().replace(/^=/,'').trim();
+  const L4_COL={A:'sector',B:'name',C:'threat',D:'civilians',E:'deputy'};
+  // IF(condition,"true","false")
+  const ifM=f.match(/^IF\s*\((.+)\)$/i);
+  if(ifM){
+    const parts=splitL4Args(ifM[1]);
+    if(parts.length!==3) return{ok:false,display:'#VALUE!',msg:'IF needs 3 arguments: IF(condition,"true","false")'};
+    const cond=l4EvalCondition(parts[0].trim());
+    if(cond===null) return{ok:false,display:'#VALUE!',msg:'Cannot evaluate the condition. Check cell references and operators.'};
+    const vt=parts[1].trim().replace(/^"|"$/g,''), vf=parts[2].trim().replace(/^"|"$/g,'');
+    return{ok:true,display:cond?vt:vf,value:cond?vt:vf};
+  }
+  // AND(cond1,cond2,...)
+  const andM=f.match(/^AND\s*\((.+)\)$/i);
+  if(andM){
+    const parts=splitL4Args(andM[1]);
+    const results=parts.map(p=>l4EvalCondition(p.trim()));
+    if(results.some(r=>r===null)) return{ok:false,display:'#VALUE!',msg:'Cannot evaluate one or more conditions.'};
+    const val=results.every(r=>r===true);
+    return{ok:true,display:val?'TRUE':'FALSE',value:val?'TRUE':'FALSE'};
+  }
+  // OR(cond1,cond2,...)
+  const orM=f.match(/^OR\s*\((.+)\)$/i);
+  if(orM){
+    const parts=splitL4Args(orM[1]);
+    const results=parts.map(p=>l4EvalCondition(p.trim()));
+    if(results.some(r=>r===null)) return{ok:false,display:'#VALUE!',msg:'Cannot evaluate one or more conditions.'};
+    const val=results.some(r=>r===true);
+    return{ok:true,display:val?'TRUE':'FALSE',value:val?'TRUE':'FALSE'};
+  }
+  // COUNTIF(range,">60" or "value")
+  const countifM=f.match(/^COUNTIF\s*\(\s*([A-E]\d+:[A-E]\d+)\s*,\s*"([^"]*)"\s*\)$/i);
+  if(countifM){
+    const col=countifM[1][0].toUpperCase(), criteria=countifM[2];
+    const key=L4_COL[col];
+    if(!key) return{ok:false,display:'#REF!',msg:'Use columns A–E only.'};
+    const cmpM=criteria.match(/^(>=|<=|<>|>|<|=)?(.+)$/);
+    const op=cmpM[1]||'=', rawVal=cmpM[2].trim();
+    const numVal=parseFloat(rawVal);
+    let count=0;
+    for(const r of L4_DB){
+      const cv=r[key];
+      if(!isNaN(numVal)&&typeof cv==='number'){
+        const ok={'>':cv>numVal,'<':cv<numVal,'>=':cv>=numVal,'<=':cv<=numVal,'=':cv===numVal,'<>':cv!==numVal}[op];
+        if(ok) count++;
+      } else {
+        if((op==='='||op==='')&&String(cv).toLowerCase()===rawVal.toLowerCase()) count++;
+        if(op==='<>'&&String(cv).toLowerCase()!==rawVal.toLowerCase()) count++;
+      }
+    }
+    return{ok:true,display:String(count),value:count};
+  }
+  return{ok:false,display:'#FORMULA?',msg:'Try =IF(C2>80,"Critical","Safe"), =AND(C8>90,E8="No"), =OR(C4<50,C7<50), or =COUNTIF(C2:C9,">60")'};
+}
+
+function l4EvalFormula() {
+  const inputEl=document.getElementById('l4-formula-input');
+  const formula=inputEl.value.trim();
+  if(!formula){inputEl.focus();return;}
+  const c=L4_CHALLENGES[L4.idx];
+  const res=l4ParseAndEval(formula);
+  const rc=document.getElementById('l4-A12');
+  if(!res.ok){
+    rc.textContent=res.display; rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l4-feedback','bad',`❌ ${res.display} — ${res.msg}`);
+    inputEl.focus(); return;
+  }
+  rc.textContent=res.display;
+  const correct=typeof c.answer==='number'
+    ?(parseInt(res.value)===c.answer)
+    :String(res.value).toLowerCase()===String(c.answer).toLowerCase();
+  if(correct){
+    rc.className='xl-cell xl-result-ok xl-active';
+    L4.score++;
+    L4.defense=Math.min(100,L4.defense+20);
+    updateL4Defense();
+    const b=document.getElementById('l4-board');
+    const d=document.createElement('div'); d.className='board-pin';
+    d.innerHTML=`<strong>📌</strong> ${c.boardLabel}`; b.appendChild(d);
+    showFeedback('l4-feedback','ok',`✅ Sector secured! Formula returned <strong>${res.display}</strong>. ${c.explanation}`);
+    inputEl.disabled=true;
+    document.getElementById('l4-next').classList.remove('hidden');
+  } else {
+    rc.className='xl-cell xl-result-err xl-active';
+    showFeedback('l4-feedback','bad',`❌ Returned <strong>${res.display}</strong> — not the expected answer. Hint: ${c.explanation}`);
+    inputEl.value=''; inputEl.focus();
+  }
+  document.getElementById('l4-score-hdr').textContent=`${L4.score} / 5`;
+  document.getElementById('l4-pbar').style.width=`${((L4.idx+1)/5)*100}%`;
+}
+
+function updateL4Defense() {
+  const fill=document.getElementById('l4-defense-fill');
+  fill.style.width=`${L4.defense}%`; fill.textContent=`${L4.defense}%`;
+}
+
+function l4Next() {
+  L4.idx++;
+  if(L4.idx>=5) showL4Results(); else loadL4Challenge();
+}
+
+function showL4Results() {
+  const passed=L4.score>=4&&L4.defense>=80;
+  GS.scores[3]=L4.score;
+  showResultsScreen(
+    'Showdown at Sunset',
+    `${L4.score}/5 — ${L4.defense}% defence`, passed,
+    passed?'🏆 Red Rock Town defended! The Dusty Dollar Gang retreats!':'💀 Too many sectors unprotected. The gang broke through.',
+    [`✅ Formulas correct: ${L4.score}/5 (need 4)`,`✅ Defence score: ${L4.defense}% (need 80%)`,`${passed?'✅':'❌'} Win condition: ${passed?'MET':'NOT MET'}`],
+    passed?'🌟 See Victory Screen':'Retry Level 4',
+    passed?()=>showVictory():()=>{initLevel4();showScreen('level4');},
+    4
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESULTS SCREEN
+═══════════════════════════════════════════════════════════════════ */
+let _resContinueFn=null, _resRetryFn=null;
+
+function showResultsScreen(title, scoreStr, passed, verdict, breakdown, continueBtnLabel, onContinue, levelNum) {
+  document.getElementById('res-title').innerHTML = (passed?'⭐ ':'💀 ') + title;
+  document.getElementById('res-score').textContent = scoreStr;
+  document.getElementById('res-score').style.color = passed ? '#f0c040' : '#cc2222';
+  document.getElementById('res-verdict').innerHTML = verdict;
+  document.getElementById('res-breakdown').innerHTML = breakdown.map(l=>`<div>${l}</div>`).join('');
+  document.getElementById('res-continue').textContent = continueBtnLabel;
+  document.getElementById('res-retry').style.display = passed ? 'none' : 'inline-block';
+  _resContinueFn = onContinue;
+  _resRetryFn = passed ? null : () => {
+    if(levelNum===1){initLevel1();showScreen('level1');}
+    else if(levelNum===2){initLevel2();showScreen('level2');}
+    else if(levelNum===3){initLevel3();showScreen('level3');}
+    else if(levelNum===4){initLevel4();showScreen('level4');}
+  };
+  showScreen('results');
+}
+
+function resultsContinue() { if(_resContinueFn) _resContinueFn(); }
+function resultsRetry() { if(_resRetryFn) _resRetryFn(); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   VICTORY
+═══════════════════════════════════════════════════════════════════ */
+function showVictory() {
+  playCinematic('arrest_scene', () => {
+    const s = GS.scores;
+    const total = s.reduce((a,b)=>a+b,0);
+    const maxes = [8,11,6,5];
+    const maxTotal = maxes.reduce((a,b)=>a+b,0);
+    CIN_DATA['victory_recap'] = {
+      bg:'end_scene', left:'mayor', right:'sheriff',
+      steps:[
+        {side:'left', speaker:'Mayor Goldie', text:`Sheriff — you tracked down ${s[0]} outlaws with VLOOKUP. Not one escaped the ledger.`},
+        {side:'left', speaker:'Mayor Goldie', text:`You audited the entire railroad robbery — ${s[1]} out of 11 cases solved with SUMIF and IF.`},
+        {side:'left', speaker:'Mayor Goldie', text:`You pivoted the evidence across 6 counties — ${s[2]} out of 6 bounties accounted for.`},
+        {side:'left', speaker:'Mayor Goldie', text:`And when the gang rode in, your conditional formatting held the defence — ${s[3]} waves${s[3]===5?', perfect score':' defended'}.`},
+        {side:'right',speaker:'Sheriff (You)', text:"Red Rock was worth fighting for. And I'd do it all again — with a good spreadsheet and a great deputy."},
+      ]
+    };
+    playCinematic('victory_recap', () => {
+      document.getElementById('vic-stats').innerHTML = [
+        ['Level 1','VLOOKUP',s[0],8],
+        ['Level 2','SUMIF + IF',s[1],11],
+        ['Level 3','Pivot Tables',s[2],6],
+        ['Level 4','Cond. Formatting',s[3],5],
+      ].map(([lvl,skill,score,max])=>`<div class="stat-chip"><div class="stat-val">${score}/${max}</div><span class="stat-lbl">${lvl}<br>${skill}</span></div>`).join('')
+      + `<div class="stat-chip"><div class="stat-val">${total}/${maxTotal}</div><span class="stat-lbl">Total Score</span></div>`;
+      showScreen('victory');
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+function showFeedback(id, type, msg) {
+  const el=document.getElementById(id);
+  el.className='feedback'+(type?' '+type:'')+(msg?' show':'');
+  el.innerHTML=msg;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CINEMATIC SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+const CIN_CHARS = {
+  sheriff:{ img:'../../Red%20Rock%20images/Male_Sheriff.jpg',   name:'' },
+  dusty:  { img:'../../Red%20Rock%20images/Female_sheriff.jpg', name:'' },
+  mayor:  { img:'../../Red%20Rock%20images/Mayor%20Goldie.png',  name:'Mayor Goldie'   },
+  sam:    { img:'../../Red%20Rock%20images/Sam.png',            name:"'Slippery' Sam" },
+};
+
+/* ── Backdrop images ───────────────────────────────────────────── */
+function _cinBg(type){
+  const m={
+    day:         '../../Red%20Rock%20images/Red%20Rock%20town.webp',
+    day2:        '../../Red%20Rock%20images/RED%20Rock%20town%202.webp',
+    dusk:        '../../Red%20Rock%20images/Red%20Rock%20town.webp',
+    saloon:      '../../Red%20Rock%20images/saloon.webp',
+    saloon2:     '../../Red%20Rock%20images/Saloon_cutscene.jpg',
+    sheriffs_office: '../../Red%20Rock%20images/Sheriffs_Office.jpg',
+    arrest_scene:'../../Red%20Rock%20images/Arrest_Scene.jpg',
+    end_scene:   '../../Red%20Rock%20images/End_Scene.jpg',
+    office:      '../../Red%20Rock%20images/Mayor_Office.jpg',
+    sunset:      '../../Red%20Rock%20images/Sunset_Showdown.jpg',
+    dusty_scene: '../../Red%20Rock%20images/Dusty_Scene.jpg',
+  };
+  const src=m[type]||m.day;
+  const isDusk=type==='dusk';
+  /* saloon2 overlay darkens the background to suppress any watermark text */
+  const isSaloon2=type==='saloon2';
+  return `<img src="${src}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">`
+    +(isDusk?'<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(190,70,0,.62) 0%,rgba(90,20,0,.32) 55%,rgba(12,4,0,.18) 100%);pointer-events:none;mix-blend-mode:multiply"></div>':'')
+    +(isSaloon2?'<div style="position:absolute;inset:0;background:rgba(10,4,0,.48);pointer-events:none"></div>':'');
+}
+
+/* ── Scene data ────────────────────────────────────────────────── */
+const CIN_DATA = {
+  opening:{bg:'sheriffs_office',left:'dusty',right:'sheriff',steps:[
+    {side:'left', speaker:'Deputy Dusty', text:"Sheriff! Thank the Lord you're here. Outlaws running loose all over the county — and the records are in shambles!"},
+    {side:'right',speaker:'Sheriff (You)',text:"Calm down, Deputy. If the ledger's got Name, Alias, Crime, Hideout, Bounty, and Status — we can find any varmint."},
+    {side:'left', speaker:'Deputy Dusty', text:"It does! Columns A through F. But there's hundreds of entries and wires coming in fast — we need a VLOOKUP to pull the right record by name!"},
+    {side:'right',speaker:'Sheriff (You)',text:"Then let's get to work. No outlaw stays hidden from a well-built formula."},
+  ]},
+  l1_final:{bg:'sheriffs_office',left:'sheriff',right:'dusty',steps:[
+    {side:'right',speaker:'Deputy Dusty', text:"One more wire comin' in, Sheriff — but this fella, 'Ghost Rider', ain't in the ledger at all!"},
+    {side:'left', speaker:'Sheriff (You)',text:"A plain VLOOKUP on a missing name throws a #N/A error. That'll break the whole system."},
+    {side:'right',speaker:'Deputy Dusty', text:"IFERROR! Wrap it around the VLOOKUP — catch the error clean and return 'NOT FOUND' instead of crashing."},
+    {side:'left', speaker:'Sheriff (You)',text:"Good thinking, Deputy. Errors handled proper — that's professional-grade formula work."},
+  ]},
+  l2_opening:{bg:'office',left:'mayor',right:'sheriff',steps:[
+    {side:'left', speaker:'', text:"Sheriff, thank goodness you're here. The railroad was hit last night — three separate robberies across the county."},
+    {side:'left', speaker:'', text:"The governor arrives at sundown and he wants a full loss report. The ledgers are a disaster — nobody's tallied anything."},
+    {side:'left', speaker:'', text:"I need you to go through the Railroad Loss Registry and calculate the total losses by category and region."},
+    {side:'left', speaker:'', text:"Can I count on you, Sheriff? The whole town is watching."},
+  ]},
+  l2_final:{bg:'office',left:'mayor',right:'sheriff',steps:[
+    {side:'left', speaker:'Mayor Goldie', text:"Last case on the docket, Sheriff. Stage Depot — two thousand dollars in payroll stolen. Insurance threshold is fifteen hundred."},
+    {side:'right',speaker:'Sheriff (You)',text:"One IF statement settles it: loss above threshold → Approve Claim. Below → Deny Claim."},
+    {side:'left', speaker:'Mayor Goldie', text:"Every family in Red Rock is counting on you. Get this right and the governor releases the emergency fund."},
+    {side:'right',speaker:'Sheriff (You)',text:"Simple logic. Let's close this audit and get Red Rock what it's owed."},
+  ]},
+  l3_opening:{bg:'saloon2',left:'sam',right:'sheriff',steps:[
+    {side:'left', speaker:"'Slippery' Sam",  text:"Well well, the Sheriff comes to MY saloon. You think you can crack the county bounty books, do ya?"},
+    {side:'right',speaker:'Sheriff (You)',   text:"We've got the full registry Sam — every county, every outlaw, every dollar. Start talking."},
+    {side:'left', speaker:"'Slippery' Sam",  text:"Heh... alright. But you'll need more than a badge to make sense of it. You'll need SUMIF, COUNTIF and AVERAGEIF — and I ain't sure you've got what it takes."},
+    {side:'right',speaker:'Deputy',          text:"We've got the data and we've got the formulas. Your boys are done, Sam."},
+  ]},
+  l3_final:{bg:'saloon2',left:'sam',right:'sheriff',steps:[
+    {side:'left', speaker:"'Slippery' Sam", text:"Heh heh... you got further than I expected, Sheriff. But this last one'll stump ya — the AVERAGE amount by region."},
+    {side:'right',speaker:'Sheriff (You)',text:"Region in ROWS. Amount in VALUES. Switch the aggregation from SUM to AVERAGE. Your number's mine, Sam."},
+    {side:'left', speaker:"'Slippery' Sam", text:"...Fine. You pull that off, I'll tell you everything about the Dusty Dollar Gang's plan tonight."},
+    {side:'right',speaker:'Sheriff (You)',text:"Start talking after I'm done. Let's wrap this interrogation up."},
+  ]},
+  l4_opening:{bg:'dusty_scene',left:'dusty',right:'sheriff',steps:[
+    {side:'left', speaker:'Deputy',        text:"Sheriff — Sam talked. The Dusty Dollar Gang hits Red Rock tonight. All sectors are at risk."},
+    {side:'right',speaker:'Sheriff (You)', text:"How long do we have?"},
+    {side:'left', speaker:'Deputy',        text:"Sun's already going down. We've got the territory spreadsheet — threats, civilians, deputies per sector. We need to identify the critical zones before they ride in."},
+    {side:'right',speaker:'Sheriff (You)', text:"Then let's get to work. Every sector gets analysed. IF the threat's high we move first. No sector gets left undefended."},
+    {side:'left', speaker:'Deputy',        text:"The data's ready, Sheriff. Time to run the formulas."},
+  ]},
+  l4_final:{bg:'dusty_scene',left:'dusty',right:'sheriff',steps:[
+    {side:'left', speaker:'Deputy Dusty', text:"Last wave, Sheriff! The gang's on the horizon — I can see the dust cloud! Get the rule priority right!"},
+    {side:'right',speaker:'Sheriff (You)',text:"Most specific rule goes first. Threat above eighty gets Red before it even reaches the fifty rule."},
+    {side:'left', speaker:'Deputy Dusty', text:"Stop-if-true means once a row hits Rule 1, it stops there. Rule 2 never fires on it. Order is everything!"},
+    {side:'right',speaker:'Sheriff (You)',text:"Red Rock stands or falls on this. Set the priority — let's end this."},
+  ]},
+  arrest_scene:{bg:'arrest_scene',left:'dusty',right:'sheriff',steps:[
+    {side:'left', speaker:'Deputy Dusty', text:"That's the last of 'em, Sheriff. Every outlaw on the ledger — locked up tight."},
+    {side:'right',speaker:'Sheriff (You)',text:"Couldn't have done it without you, Dusty. Red Rock is safe."},
+  ]},
+};
+
+/* ── Runtime state ─────────────────────────────────────────────── */
+let _CS=null,_CSidx=0,_CSdone=null,_CStimer=null;
+
+function _cinChar(side,type){
+  const cd=CIN_CHARS[type]; if(!cd) return;
+  const p=side==='left'?'l':'r';
+  const img=document.getElementById(`cin-${p}-img`);
+  img.src=cd.img; img.alt=cd.name;
+  document.getElementById(`cin-${p}-name`).textContent=cd.name;
+}
+
+function playCinematic(key,onDone){
+  _CS=CIN_DATA[key]; if(!_CS){if(onDone)onDone();return;}
+  _CSidx=0; _CSdone=onDone;
+  const bg=document.getElementById('cin-bg-wrap');
+  bg.innerHTML=_cinBg(_CS.bg);
+  _cinChar('left',_CS.left); _cinChar('right',_CS.right);
+  const cl=document.getElementById('cin-char-left');
+  const cr=document.getElementById('cin-char-right');
+  cl.classList.remove('cin-entered','cin-talking');
+  cr.classList.remove('cin-entered','cin-talking');
+  document.getElementById('cin-overlay').classList.add('cin-active');
+  document.getElementById('cin-next-btn').style.display='none';
+  _MUS_current = _AUDIO_TRACKS[CIN_MUSIC[key] || 'western'];
+  musStart();
+  setTimeout(()=>{
+    cl.classList.add('cin-entered');
+    cr.classList.add('cin-entered');
+    setTimeout(_cinStep,520);
+  },80);
+}
+
+function _cinStep(){
+  if(!_CS||_CSidx>=_CS.steps.length){_cinEnd();return;}
+  const s=_CS.steps[_CSidx];
+  const cl=document.getElementById('cin-char-left');
+  const cr=document.getElementById('cin-char-right');
+  cl.classList.toggle('cin-talking',s.side==='left');
+  cr.classList.toggle('cin-talking',s.side==='right');
+  document.getElementById('cin-speaker').textContent=s.speaker;
+  document.getElementById('cin-next-btn').style.display='none';
+  const out=document.getElementById('cin-text-out');
+  out.innerHTML='';
+  if(_CStimer)clearInterval(_CStimer);
+  let i=0; const txt=s.text;
+  const isLast=_CSidx===_CS.steps.length-1;
+  _CStimer=setInterval(()=>{
+    i++;
+    out.innerHTML=txt.slice(0,i)+(i<txt.length?'<span class="cin-cursor"></span>':'');
+    if(i>=txt.length){
+      clearInterval(_CStimer);_CStimer=null;
+      const btn=document.getElementById('cin-next-btn');
+      btn.style.display='';
+      btn.textContent=isLast?"▶ Let's Ride!":'▶ Continue';
+    }
+  },24);
+}
+
+function cinNext(){
+  if(_CStimer){
+    clearInterval(_CStimer);_CStimer=null;
+    const s=_CS.steps[_CSidx];
+    document.getElementById('cin-text-out').innerHTML=s.text;
+    const btn=document.getElementById('cin-next-btn');
+    btn.style.display='';
+    btn.textContent=_CSidx===_CS.steps.length-1?"▶ Let's Ride!":'▶ Continue';
+    return;
+  }
+  _CSidx++;
+  _cinStep();
+}
+
+function _cinEnd(){
+  musStop(0.7);
+  const fade=document.getElementById('cin-fade');
+  fade.classList.add('cin-fade-in');
+  setTimeout(()=>{
+    document.getElementById('cin-overlay').classList.remove('cin-active');
+    setTimeout(()=>{
+      fade.classList.remove('cin-fade-in');
+      if(_CSdone)_CSdone();
+    },180);
+  },480);
+}
+
+function skipCinematic(){
+  if(_CStimer){clearInterval(_CStimer);_CStimer=null;}
+  musStop(0.35);
+  _cinEnd();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MUSIC — multi-track system with fade in/out and mute toggle
+═══════════════════════════════════════════════════════════════════ */
+const _AUDIO_TRACKS = {
+  western:     new Audio('western_music.mp3'),
+  ghost_riders:new Audio('../../Red%20Rock%20images/ghost-riders-vince-mcgill-main-version-33937-02-01.mp3'),
+  whiskey_bar: new Audio('../../Red%20Rock%20images/whiskey-bar-ragtime-soundroll-main-version-33525-01-04.mp3'),
+};
+Object.values(_AUDIO_TRACKS).forEach(a => { a.loop = true; a.volume = 0; });
+
+/* Map cinematic keys to their music track; default is 'western' */
+const CIN_MUSIC = {
+  l2_opening:    'ghost_riders',
+  l2_final:      'ghost_riders',
+  l3_opening:    'whiskey_bar',
+  l3_final:      'whiskey_bar',
+  arrest_scene:  'ghost_riders',
+  victory_recap: 'ghost_riders',
+};
+
+let _MUS_current = _AUDIO_TRACKS.western;
+let _MUS_muted = false;
+let _MUS_ft = null; /* fade timer */
+
+function musStart() {
+  if (_MUS_muted) return;
+  clearInterval(_MUS_ft);
+  _MUS_current.play().catch(() => {});
+  const target = 0.72;
+  _MUS_ft = setInterval(() => {
+    const v = Math.min(_MUS_current.volume + 0.04, target);
+    _MUS_current.volume = v;
+    if (v >= target) { clearInterval(_MUS_ft); _MUS_ft = null; }
+  }, 80);
+}
+
+function musStop(fadeSecs) {
+  clearInterval(_MUS_ft);
+  if (_MUS_current.paused) return;
+  const steps = Math.max(1, Math.round(((fadeSecs ?? 0.8) * 1000) / 80));
+  const dec = (_MUS_current.volume || 0.72) / steps;
+  _MUS_ft = setInterval(() => {
+    const v = Math.max(0, _MUS_current.volume - dec);
+    _MUS_current.volume = v;
+    if (v <= 0) {
+      clearInterval(_MUS_ft); _MUS_ft = null;
+      _MUS_current.pause();
+      _MUS_current.currentTime = 0;
+    }
+  }, 80);
+}
+
+function musMuteToggle() {
+  _MUS_muted = !_MUS_muted;
+  const btn = document.getElementById('cin-mute-btn');
+  if (btn) btn.textContent = _MUS_muted ? '🔇' : '🔊';
+  if (_MUS_muted) {
+    musStop(0.3);
+  } else if (document.getElementById('cin-overlay').classList.contains('cin-active')) {
+    musStart();
+  }
+}
+</script>
+</body>
+</html>
