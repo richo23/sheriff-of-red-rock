@@ -313,54 +313,55 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 /* Speech bubble text box — upper-right of image */
 #lesson-bubble{
   position:absolute;
-  left:54%;top:10%;width:40%;height:34%;
+  left:57%;top:12%;width:35%;height:30%;
+  box-sizing:border-box;
   background:transparent;border:none;
-  overflow:hidden;overflow-y:auto;
-  padding:12px 16px;
+  overflow-y:auto;overflow-x:hidden;
+  padding:10px 14px;
   font-family:'Playfair Display',Georgia,serif;
-  font-size:12px;line-height:1.55;color:#2a1a0a;
+  font-size:11.5px;line-height:1.5;color:#2a1a0a;
 }
 #lesson-bubble-text{
-  width:100%;
-  font-size:1em;line-height:1.55;color:#2a1a0a;
+  width:100%;box-sizing:border-box;
+  font-size:1em;line-height:1.5;color:#2a1a0a;
 }
 #lesson-bubble-text .lcode{
   font-family:'Roboto Mono',monospace;font-size:.88em;font-weight:600;
-  color:#1a0c06;
+  color:#1a0c06;word-break:break-all;
 }
-/* Controls row — sits BELOW the image, outside the aspect-ratio container */
+/* Top control bar — absolutely positioned inside the 16:9 container */
 #lesson-controls{
-  background:rgba(20,10,5,0.75);
-  padding:12px 24px;
-  display:flex;align-items:center;justify-content:center;gap:20px;
-  flex-shrink:0;
+  position:absolute;top:0;left:0;width:100%;
+  box-sizing:border-box;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 16px;
+  background:rgba(20,8,2,0.78);
+  z-index:10;
 }
 #lesson-slide-ctr{
   font-family:'Roboto Mono',monospace;font-size:13px;
-  color:#c8a84b;white-space:nowrap;min-width:50px;text-align:center;
+  color:#c8a84b;white-space:nowrap;text-align:center;flex:1;
 }
-.lesson-nav{
+/* Shared button base */
+.lesson-btn-base{
   background:#c8a84b;color:#2a1a0a;
-  border:2px solid #8b6914;padding:8px 24px;
-  font-family:'Rye',cursive;font-weight:bold;font-size:14px;
-  border-radius:6px;cursor:pointer;min-width:90px;
+  border:2px solid #8b6914;padding:6px 18px;
+  font-family:'Rye',cursive;font-weight:bold;font-size:13px;
+  border-radius:5px;cursor:pointer;min-width:70px;
   letter-spacing:.5px;transition:all .15s;
 }
-.lesson-nav:hover{background:#dbbe60;transform:translateY(-1px)}
-/* Close button — top-right of image */
+.lesson-btn-base:hover{background:#dbbe60;transform:translateY(-1px)}
+/* Close button override */
 #lesson-close{
-  position:absolute;top:10px;right:12px;
-  font-family:'Rye',cursive;font-size:16px;padding:6px 12px;
   background:#8b1a1a;color:#f5e6c8;
-  border:2px solid #c8a84b;border-radius:4px;cursor:pointer;
-  transition:all .15s;z-index:10001;
+  border:2px solid #c8a84b;
 }
 #lesson-close:hover{background:#5c0f0f;transform:translateY(-1px)}
 /* Typewriter cursor */
 .lesson-cursor{display:inline-block;width:2px;height:.85em;background:#2a1a0a;vertical-align:middle;animation:cinBlink .7s step-end infinite;margin-left:1px}
 @media(max-width:700px){
-  #lesson-bubble{font-size:10px;padding:8px 10px}
-  .lesson-nav{font-size:12px;padding:6px 14px;min-width:70px}
+  #lesson-bubble{font-size:9.5px;padding:6px 8px}
+  .lesson-btn-base{font-size:11px;padding:5px 10px;min-width:55px}
 }
 </style>
 </head>
@@ -701,15 +702,16 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 <div id="lesson-overlay">
   <div id="lesson-panel">
     <div id="lesson-container">
-      <button id="lesson-close" onclick="closeLesson()">✕ Close</button>
+      <!-- Top bar: Prev | counter | Next | Close -->
+      <div id="lesson-controls">
+        <button class="lesson-btn-base" id="lesson-prev" onclick="lessonPrev()">◀ Prev</button>
+        <span id="lesson-slide-ctr">1 / 3</span>
+        <button class="lesson-btn-base" id="lesson-next" onclick="lessonNext()">Next ▶</button>
+        <button class="lesson-btn-base" id="lesson-close" onclick="closeLesson()">✕ Close</button>
+      </div>
       <div id="lesson-bubble">
         <div id="lesson-bubble-text"></div>
       </div>
-    </div>
-    <div id="lesson-controls">
-      <button class="lesson-nav lesson-nav-prev" id="lesson-prev" onclick="lessonPrev()">◀ Prev</button>
-      <span id="lesson-slide-ctr">1 / 3</span>
-      <button class="lesson-nav lesson-nav-next" id="lesson-next" onclick="lessonNext()">Next ▶</button>
     </div>
   </div>
 </div>
