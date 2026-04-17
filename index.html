@@ -294,68 +294,73 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
   position:fixed;inset:0;z-index:10000;display:none;
   align-items:center;justify-content:center;
   background:rgba(0,0,0,.85);
+  padding:10px;
 }
 #lesson-overlay.lesson-open{display:flex}
-#lesson-container{
-  position:relative;width:100%;max-width:1100px;
-  aspect-ratio:16/9;background:#1a0c06;
+/* Column panel: image on top, controls below */
+#lesson-panel{
+  display:flex;flex-direction:column;
+  width:100%;max-width:1100px;
   border:3px solid var(--gold);border-radius:8px;
   overflow:hidden;
+}
+#lesson-container{
+  position:relative;width:100%;
+  aspect-ratio:16/9;background:#1a0c06;
   background-image:url('images/Lesson_accountant.png');
   background-size:cover;background-repeat:no-repeat;background-position:center;
-  margin:0 10px;
 }
 /* Speech bubble text box — upper-right of image */
 #lesson-bubble{
   position:absolute;
-  left:52%;top:4%;width:43%;height:39%;
-  background:transparent;border:none;overflow:hidden;
-  padding:16px;
+  left:54%;top:10%;width:40%;height:34%;
+  background:transparent;border:none;
+  overflow:hidden;overflow-y:auto;
+  padding:12px 16px;
   font-family:'Playfair Display',Georgia,serif;
-  font-size:13px;line-height:1.6;color:#2a1a0a;
-  display:flex;align-items:flex-start;
+  font-size:12px;line-height:1.55;color:#2a1a0a;
 }
 #lesson-bubble-text{
   width:100%;
-  font-size:1em;line-height:1.6;color:#2a1a0a;
+  font-size:1em;line-height:1.55;color:#2a1a0a;
 }
 #lesson-bubble-text .lcode{
-  font-family:'Roboto Mono',monospace;font-size:.9em;font-weight:600;
+  font-family:'Roboto Mono',monospace;font-size:.88em;font-weight:600;
   color:#1a0c06;
 }
-/* Controls below image */
+/* Controls row — sits BELOW the image, outside the aspect-ratio container */
 #lesson-controls{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:8px 14px;
-  background:linear-gradient(to top,rgba(10,6,4,.9) 0%,rgba(10,6,4,.6) 70%,transparent 100%);
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(20,10,5,0.75);
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  flex-shrink:0;
 }
 #lesson-slide-ctr{
-  font-family:'Roboto Mono',monospace;font-size:.75em;color:var(--tan);white-space:nowrap;
+  font-family:'Roboto Mono',monospace;font-size:13px;
+  color:#c8a84b;white-space:nowrap;min-width:50px;text-align:center;
 }
 .lesson-nav{
-  font-family:'Rye',cursive;font-size:.78em;padding:6px 16px;
-  border:2px solid var(--gold);border-radius:4px;cursor:pointer;
+  background:#c8a84b;color:#2a1a0a;
+  border:2px solid #8b6914;padding:8px 24px;
+  font-family:'Rye',cursive;font-weight:bold;font-size:14px;
+  border-radius:6px;cursor:pointer;min-width:90px;
   letter-spacing:.5px;transition:all .15s;
 }
-.lesson-nav-prev{background:var(--brown);color:var(--paper)}
-.lesson-nav-prev:hover{background:var(--red);color:var(--gold2)}
-.lesson-nav-next{background:var(--red);color:var(--gold2)}
-.lesson-nav-next:hover{background:var(--red2);transform:translateY(-1px)}
-/* Close button */
+.lesson-nav:hover{background:#dbbe60;transform:translateY(-1px)}
+/* Close button — top-right of image */
 #lesson-close{
   position:absolute;top:10px;right:12px;
-  font-family:'Rye',cursive;font-size:.78em;padding:5px 13px;
-  background:rgba(0,0,0,.65);color:var(--tan);
-  border:1px solid var(--tan);border-radius:4px;cursor:pointer;
-  transition:all .15s;letter-spacing:.5px;z-index:10001;
+  font-family:'Rye',cursive;font-size:16px;padding:6px 12px;
+  background:#8b1a1a;color:#f5e6c8;
+  border:2px solid #c8a84b;border-radius:4px;cursor:pointer;
+  transition:all .15s;z-index:10001;
 }
-#lesson-close:hover{background:rgba(0,0,0,.88);color:var(--gold2);border-color:var(--gold)}
+#lesson-close:hover{background:#5c0f0f;transform:translateY(-1px)}
 /* Typewriter cursor */
 .lesson-cursor{display:inline-block;width:2px;height:.85em;background:#2a1a0a;vertical-align:middle;animation:cinBlink .7s step-end infinite;margin-left:1px}
 @media(max-width:700px){
-  #lesson-bubble{font-size:10px;padding:10px}
-  #lesson-container{aspect-ratio:16/9;margin:0 4px}
+  #lesson-bubble{font-size:10px;padding:8px 10px}
+  .lesson-nav{font-size:12px;padding:6px 14px;min-width:70px}
 }
 </style>
 </head>
@@ -694,10 +699,12 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 
 <!-- ═══ LESSON OVERLAY ══════════════════════════════════════════════ -->
 <div id="lesson-overlay">
-  <div id="lesson-container">
-    <button id="lesson-close" onclick="closeLesson()">✕ Close</button>
-    <div id="lesson-bubble">
-      <div id="lesson-bubble-text"></div>
+  <div id="lesson-panel">
+    <div id="lesson-container">
+      <button id="lesson-close" onclick="closeLesson()">✕ Close</button>
+      <div id="lesson-bubble">
+        <div id="lesson-bubble-text"></div>
+      </div>
     </div>
     <div id="lesson-controls">
       <button class="lesson-nav lesson-nav-prev" id="lesson-prev" onclick="lessonPrev()">◀ Prev</button>
