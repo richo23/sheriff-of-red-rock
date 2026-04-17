@@ -274,6 +274,89 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 /* Hide flanking character portraits in all cutscenes */
 .cin-char{display:none!important}
 @media(max-width:560px){.cin-char-img{height:55vh;max-width:28vw}#cin-bubble{padding:8px 12px}}
+
+/* ═══ LESSON BAR + BUTTON ══════════════════════════════════════════ */
+.lesson-bar{
+  width:100%;background:#1a0c06;padding:6px 18px;
+  border-bottom:2px solid #8b6914;display:flex;align-items:center;flex-shrink:0;
+}
+.btn-lesson{
+  font-family:'Rye',cursive;font-size:.88em;padding:8px 20px;
+  background:#c8a84b;color:#2a1a0a;
+  border:2px solid #8b6914;border-radius:6px;
+  cursor:pointer;letter-spacing:.5px;font-weight:bold;
+  box-shadow:1px 2px 8px rgba(0,0,0,.5);transition:all .15s;
+}
+.btn-lesson:hover{background:#dbbe60;transform:translateY(-1px);box-shadow:1px 3px 12px rgba(0,0,0,.6)}
+
+/* ═══ LESSON OVERLAY ═══════════════════════════════════════════════ */
+#lesson-overlay{
+  position:fixed;inset:0;z-index:10000;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.85);
+}
+#lesson-overlay.lesson-open{display:flex}
+#lesson-container{
+  position:relative;width:100%;max-width:1100px;
+  aspect-ratio:16/9;background:#1a0c06;
+  border:3px solid var(--gold);border-radius:8px;
+  overflow:hidden;
+  background-image:url('images/Lesson_accountant.png');
+  background-size:cover;background-repeat:no-repeat;background-position:center;
+  margin:0 10px;
+}
+/* Speech bubble text box — upper-right of image */
+#lesson-bubble{
+  position:absolute;
+  left:52%;top:4%;width:43%;height:39%;
+  background:transparent;border:none;overflow:hidden;
+  padding:16px;
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:13px;line-height:1.6;color:#2a1a0a;
+  display:flex;align-items:flex-start;
+}
+#lesson-bubble-text{
+  width:100%;
+  font-size:1em;line-height:1.6;color:#2a1a0a;
+}
+#lesson-bubble-text .lcode{
+  font-family:'Roboto Mono',monospace;font-size:.9em;font-weight:600;
+  color:#1a0c06;
+}
+/* Controls below image */
+#lesson-controls{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:8px 14px;
+  background:linear-gradient(to top,rgba(10,6,4,.9) 0%,rgba(10,6,4,.6) 70%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+#lesson-slide-ctr{
+  font-family:'Roboto Mono',monospace;font-size:.75em;color:var(--tan);white-space:nowrap;
+}
+.lesson-nav{
+  font-family:'Rye',cursive;font-size:.78em;padding:6px 16px;
+  border:2px solid var(--gold);border-radius:4px;cursor:pointer;
+  letter-spacing:.5px;transition:all .15s;
+}
+.lesson-nav-prev{background:var(--brown);color:var(--paper)}
+.lesson-nav-prev:hover{background:var(--red);color:var(--gold2)}
+.lesson-nav-next{background:var(--red);color:var(--gold2)}
+.lesson-nav-next:hover{background:var(--red2);transform:translateY(-1px)}
+/* Close button */
+#lesson-close{
+  position:absolute;top:10px;right:12px;
+  font-family:'Rye',cursive;font-size:.78em;padding:5px 13px;
+  background:rgba(0,0,0,.65);color:var(--tan);
+  border:1px solid var(--tan);border-radius:4px;cursor:pointer;
+  transition:all .15s;letter-spacing:.5px;z-index:10001;
+}
+#lesson-close:hover{background:rgba(0,0,0,.88);color:var(--gold2);border-color:var(--gold)}
+/* Typewriter cursor */
+.lesson-cursor{display:inline-block;width:2px;height:.85em;background:#2a1a0a;vertical-align:middle;animation:cinBlink .7s step-end infinite;margin-left:1px}
+@media(max-width:700px){
+  #lesson-bubble{font-size:10px;padding:10px}
+  #lesson-container{aspect-ratio:16/9;margin:0 4px}
+}
 </style>
 </head>
 <body>
@@ -322,6 +405,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
     <div class="pbar-wrap"><div class="pbar-fill" id="l1-pbar" style="width:0%"></div></div>
     <span class="lvl-score" id="l1-score-hdr">0 / 8</span>
   </div>
+  <div class="lesson-bar"><button class="btn-lesson" onclick="openLesson(1)">📖 Lesson</button></div>
   <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
     <div class="col-wrap" style="align-items:start;gap:12px">
       <!-- LEFT: Mission panel -->
@@ -377,6 +461,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
     <div class="pbar-wrap"><div class="pbar-fill" id="l2-pbar" style="width:0%"></div></div>
     <span class="lvl-score" id="l2-score-hdr">0 / 11</span>
   </div>
+  <div class="lesson-bar"><button class="btn-lesson" onclick="openLesson(2)">📖 Lesson</button></div>
   <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
     <div class="col-wrap" style="align-items:start;gap:12px">
       <!-- LEFT: Mission panel -->
@@ -433,6 +518,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
     <div class="pbar-wrap"><div class="pbar-fill" id="l3-pbar" style="width:0%"></div></div>
     <span class="lvl-score" id="l3-score-hdr">0 / 6</span>
   </div>
+  <div class="lesson-bar"><button class="btn-lesson" onclick="openLesson(3)">📖 Lesson</button></div>
   <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
     <div class="col-wrap" style="align-items:start;gap:12px">
       <!-- LEFT: Mission panel -->
@@ -487,6 +573,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
     <div class="pbar-wrap"><div class="pbar-fill" id="l4-pbar" style="width:0%"></div></div>
     <span class="lvl-score" id="l4-score-hdr">0 / 5</span>
   </div>
+  <div class="lesson-bar"><button class="btn-lesson" onclick="openLesson(4)">📖 Lesson</button></div>
   <div style="width:100%;max-width:1260px;padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
     <div class="col-wrap" style="align-items:start;gap:12px">
       <!-- LEFT: Mission panel -->
@@ -604,6 +691,21 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
   </div>
 </div>
 <div id="cin-fade"></div>
+
+<!-- ═══ LESSON OVERLAY ══════════════════════════════════════════════ -->
+<div id="lesson-overlay">
+  <div id="lesson-container">
+    <button id="lesson-close" onclick="closeLesson()">✕ Close</button>
+    <div id="lesson-bubble">
+      <div id="lesson-bubble-text"></div>
+    </div>
+    <div id="lesson-controls">
+      <button class="lesson-nav lesson-nav-prev" id="lesson-prev" onclick="lessonPrev()">◀ Prev</button>
+      <span id="lesson-slide-ctr">1 / 3</span>
+      <button class="lesson-nav lesson-nav-next" id="lesson-next" onclick="lessonNext()">Next ▶</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
@@ -1887,6 +1989,139 @@ function musMuteToggle() {
     musStart();
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LESSON OVERLAY
+═══════════════════════════════════════════════════════════════════ */
+const LESSON_CONTENT = {
+  1: [
+    "Howdy, partner! VLOOKUP lets you search for a value in a table and pull back information from the same row. Think of it like finding an outlaw by name in your ledger and reading across to find their bounty!",
+    "The formula has 4 parts:\n\n<span class='lcode'>=VLOOKUP( lookup_value, table_array, col_index, FALSE )</span>\n\n► <strong>lookup_value</strong>: the name you're searching for\n► <strong>table_array</strong>: your full data range\n► <strong>col_index</strong>: which column to return\n► <strong>FALSE</strong>: exact match only — no guessing!",
+    "Example:\n\n<span class='lcode'>=VLOOKUP(\"Jesse Blackwood\", A2:F11, 5, FALSE)</span>\n\nFinds Jesse in column A, then returns the value in column 5 — his bounty of $500. Change the <strong>col_index</strong> number to fetch a different column from the same row!"
+  ],
+  2: [
+    "SUMIF adds up numbers that meet a condition. Need the total losses from Gold shipments only? SUMIF handles it without you touching every row yourself!",
+    "SUMIF syntax:\n\n<span class='lcode'>=SUMIF( range, criteria, sum_range )</span>\n\n► <strong>range</strong>: where to check the condition (e.g. Category column)\n► <strong>criteria</strong>: what to look for (e.g. \"Gold\")\n► <strong>sum_range</strong>: what to add up (e.g. Amount column)",
+    "IF returns one value when something is true, another when it's false.\n\n<span class='lcode'>=IF( logical_test, value_if_true, value_if_false )</span>\n\nExample: <span class='lcode'>=IF(C2&gt;500, \"High\", \"Low\")</span> — if the loss exceeds $500 it's High, otherwise Low. You can nest IFs for multiple conditions!"
+  ],
+  3: [
+    "A Pivot Table summarises a big list into a neat report — without writing a single formula! Drag fields into the zones and the table builds itself. It's the fastest way to spot patterns in your data.",
+    "The four zones:\n\n► <strong>ROWS</strong>: groups your data down the left side\n► <strong>COLUMNS</strong>: splits it across the top\n► <strong>VALUES</strong>: counts or sums the numbers\n► <strong>FILTERS</strong>: narrows the whole table to a subset\n\nDrag the right field into the right zone!",
+    "For each round, read the question carefully — it tells you exactly which field to place where. Drop your field into the correct zone and check the result. Get 5 out of 6 rounds right to win the level. Take your time, partner!"
+  ],
+  4: [
+    "Conditional Formatting changes how a cell looks based on its value. You write a formula — the spreadsheet does the colouring! It's perfect for spotting threats, flagging risks, or highlighting priority targets.",
+    "Three logic tools you'll need:\n\n► <span class='lcode'>IF( condition, \"true\", \"false\" )</span> — one condition\n► <span class='lcode'>AND( cond1, cond2 )</span> — BOTH must be true\n► <span class='lcode'>OR( cond1, cond2 )</span> — at least ONE must be true\n\nCombine them to build smarter rules!",
+    "COUNTIF counts how many cells match a condition:\n\n<span class='lcode'>=COUNTIF( range, criteria )</span>\n\nExample: <span class='lcode'>=COUNTIF(E2:E9, \"Yes\")</span> counts how many sectors have a deputy on duty. Use this in the final wave to count across the whole territory. Win 4 of 5 waves to take back Red Rock!"
+  ]
+};
+
+let _lessonLevel = 0;
+let _lessonSlide = 0;
+let _lessonTwTimer = null;
+
+function openLesson(level) {
+  _lessonLevel = level;
+  _lessonSlide = 0;
+  document.getElementById('lesson-overlay').classList.add('lesson-open');
+  lessonRenderSlide();
+}
+
+function closeLesson() {
+  document.getElementById('lesson-overlay').classList.remove('lesson-open');
+  if (_lessonTwTimer) { clearTimeout(_lessonTwTimer); _lessonTwTimer = null; }
+}
+
+function lessonPrev() {
+  if (_lessonSlide > 0) {
+    _lessonSlide--;
+    lessonRenderSlide();
+  }
+}
+
+function lessonNext() {
+  const slides = LESSON_CONTENT[_lessonLevel];
+  if (_lessonSlide < slides.length - 1) {
+    _lessonSlide++;
+    lessonRenderSlide();
+  }
+}
+
+function lessonRenderSlide() {
+  const slides = LESSON_CONTENT[_lessonLevel];
+  const total = slides.length;
+  const idx = _lessonSlide;
+
+  // Update counter
+  document.getElementById('lesson-slide-ctr').textContent = (idx + 1) + ' / ' + total;
+
+  // Show/hide nav buttons
+  document.getElementById('lesson-prev').style.visibility = (idx === 0) ? 'hidden' : 'visible';
+  document.getElementById('lesson-next').style.visibility = (idx === total - 1) ? 'hidden' : 'visible';
+
+  // Cancel any running typewriter
+  if (_lessonTwTimer) { clearTimeout(_lessonTwTimer); _lessonTwTimer = null; }
+
+  // Convert raw text (with embedded HTML spans) into a flat sequence for typewriter.
+  // We render via innerHTML so we need to type into the rendered DOM using a
+  // character-by-character approach on the final HTML string.
+  const rawHtml = slides[idx].replace(/\n/g, '<br>');
+  lessonTypewrite(rawHtml);
+}
+
+function lessonTypewrite(html) {
+  const el = document.getElementById('lesson-bubble-text');
+  el.innerHTML = '';
+
+  // Build an array of "chunks": either a tag (rendered instantly) or a text char.
+  const chunks = [];
+  let i = 0;
+  while (i < html.length) {
+    if (html[i] === '<') {
+      // Grab the whole tag
+      const end = html.indexOf('>', i);
+      if (end === -1) { chunks.push({ type: 'char', val: html[i] }); i++; continue; }
+      chunks.push({ type: 'tag', val: html.substring(i, end + 1) });
+      i = end + 1;
+    } else {
+      chunks.push({ type: 'char', val: html[i] });
+      i++;
+    }
+  }
+
+  let ci = 0;
+  let rendered = '';
+
+  function tick() {
+    if (ci >= chunks.length) {
+      el.innerHTML = rendered;
+      return;
+    }
+    const chunk = chunks[ci++];
+    rendered += chunk.val;
+
+    // If the next chunk(s) are also tags, consume them immediately (no delay)
+    while (ci < chunks.length && chunks[ci].type === 'tag') {
+      rendered += chunks[ci].val;
+      ci++;
+    }
+
+    el.innerHTML = rendered + '<span class="lesson-cursor"></span>';
+
+    if (chunk.type === 'char') {
+      _lessonTwTimer = setTimeout(tick, 30);
+    } else {
+      // tag rendered instantly, schedule next tick with no extra delay
+      _lessonTwTimer = setTimeout(tick, 0);
+    }
+  }
+  tick();
+}
+
+// Close overlay on backdrop click (outside the container)
+document.getElementById('lesson-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeLesson();
+});
 </script>
 </body>
 </html>
