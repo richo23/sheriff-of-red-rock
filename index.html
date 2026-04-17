@@ -313,13 +313,13 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 /* Speech bubble text box — upper-right of image */
 #lesson-bubble{
   position:absolute;
-  left:57%;top:12%;width:35%;height:30%;
+  left:54%;top:13%;width:30%;height:28%;
   box-sizing:border-box;
   background:transparent;border:none;
   overflow-y:auto;overflow-x:hidden;
-  padding:10px 14px;
+  padding:10px 12px;
   font-family:'Playfair Display',Georgia,serif;
-  font-size:11.5px;line-height:1.5;color:#2a1a0a;
+  font-size:11px;line-height:1.5;color:#2a1a0a;
 }
 #lesson-bubble-text{
   width:100%;box-sizing:border-box;
@@ -329,25 +329,23 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
   font-family:'Roboto Mono',monospace;font-size:.88em;font-weight:600;
   color:#1a0c06;word-break:break-all;
 }
-/* Top control bar — absolutely positioned inside the 16:9 container */
+/* Button group — bottom-right desk area of image */
 #lesson-controls{
-  position:absolute;top:0;left:0;width:100%;
-  box-sizing:border-box;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:8px 16px;
-  background:rgba(20,8,2,0.78);
-  z-index:10;
+  position:absolute;
+  bottom:10%;left:57%;width:38%;
+  display:flex;justify-content:center;align-items:center;
+  gap:12px;z-index:10;
 }
 #lesson-slide-ctr{
-  font-family:'Roboto Mono',monospace;font-size:13px;
-  color:#c8a84b;white-space:nowrap;text-align:center;flex:1;
+  font-family:'Roboto Mono',monospace;font-size:12px;font-weight:bold;
+  color:#c8a84b;white-space:nowrap;text-align:center;min-width:36px;
 }
 /* Shared button base */
 .lesson-btn-base{
   background:#c8a84b;color:#2a1a0a;
-  border:2px solid #8b6914;padding:6px 18px;
+  border:2px solid #8b6914;padding:6px 16px;
   font-family:'Rye',cursive;font-weight:bold;font-size:13px;
-  border-radius:5px;cursor:pointer;min-width:70px;
+  border-radius:5px;cursor:pointer;min-width:64px;
   letter-spacing:.5px;transition:all .15s;
 }
 .lesson-btn-base:hover{background:#dbbe60;transform:translateY(-1px)}
@@ -360,8 +358,8 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 /* Typewriter cursor */
 .lesson-cursor{display:inline-block;width:2px;height:.85em;background:#2a1a0a;vertical-align:middle;animation:cinBlink .7s step-end infinite;margin-left:1px}
 @media(max-width:700px){
-  #lesson-bubble{font-size:9.5px;padding:6px 8px}
-  .lesson-btn-base{font-size:11px;padding:5px 10px;min-width:55px}
+  #lesson-bubble{font-size:9px;padding:6px 8px}
+  .lesson-btn-base{font-size:11px;padding:5px 10px;min-width:50px}
 }
 </style>
 </head>
@@ -702,7 +700,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 <div id="lesson-overlay">
   <div id="lesson-panel">
     <div id="lesson-container">
-      <!-- Top bar: Prev | counter | Next | Close -->
+      <!-- Bottom-right desk area: Prev | counter | Next | Close -->
       <div id="lesson-controls">
         <button class="lesson-btn-base" id="lesson-prev" onclick="lessonPrev()">◀ Prev</button>
         <span id="lesson-slide-ctr">1 / 3</span>
