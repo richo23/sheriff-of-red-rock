@@ -313,7 +313,7 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
 /* CSS speech bubble — upper-right of image */
 .lesson-bubble{
   position:absolute;
-  top:5%;left:45%;width:50%;
+  top:8%;left:45%;width:50%;
   background:#fffef5;
   border:3px solid #8b6914;
   border-radius:14px;
@@ -323,26 +323,26 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
   z-index:5;
   min-height:200px;
 }
-/* Bubble tail — fill triangle (points down-left toward character) */
+/* Bubble tail fill — down-left toward accountant */
 .lesson-bubble::after{
   content:'';
   position:absolute;
-  bottom:-24px;left:18%;
+  bottom:-22px;left:12%;
   width:0;height:0;
-  border-left:16px solid transparent;
+  border-top:22px solid #fffef5;
+  border-left:28px solid transparent;
   border-right:8px solid transparent;
-  border-top:24px solid #fffef5;
   z-index:6;
 }
-/* Bubble tail — border outline */
+/* Bubble tail border — down-left toward accountant */
 .lesson-bubble::before{
   content:'';
   position:absolute;
-  bottom:-28px;left:calc(18% - 2px);
+  bottom:-27px;left:calc(12% - 3px);
   width:0;height:0;
-  border-left:18px solid transparent;
+  border-top:27px solid #8b6914;
+  border-left:32px solid transparent;
   border-right:10px solid transparent;
-  border-top:28px solid #8b6914;
   z-index:5;
 }
 .lesson-bubble-text{
