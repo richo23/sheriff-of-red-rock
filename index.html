@@ -1152,7 +1152,7 @@ function l2SelectCell(ref) {
 }
 
 function loadL2Challenge() {
-  if (L2.idx===10){ showL2Results(); return; }
+  if (L2.idx >= L2_CHALLENGES.length){ showL2Results(); return; }
   if (L2.idx===9 && !GS.cinPlayed.has('l2_final')){
     GS.cinPlayed.add('l2_final'); playCinematic('l2_final',loadL2Challenge); return;
   }
