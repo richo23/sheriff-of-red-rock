@@ -387,9 +387,22 @@ h1.gtitle{font-family:'Rye',cursive;font-size:clamp(1.8em,5vw,3.2em);color:var(-
   .lesson-bubble-text{font-size:10px;max-height:100px}
   .lesson-btn-base{font-size:11px;padding:5px 10px;min-width:50px}
 }
+
+/* ═══ FULLSCREEN BUTTON ══════════════════════════════════════════ */
+#fs-btn{
+  position:fixed;top:14px;right:16px;z-index:9999;
+  font-size:1.1em;line-height:1;
+  color:var(--gold2);background:rgba(0,0,0,.55);
+  border:1px solid var(--gold);border-radius:4px;
+  padding:5px 10px;cursor:pointer;
+  transition:all .15s;
+}
+#fs-btn:hover{background:rgba(0,0,0,.85);border-color:var(--gold2);color:#fff}
 </style>
 </head>
 <body>
+
+<button id="fs-btn" onclick="toggleFullscreen()">&#x26F6;</button>
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <!--  SCREEN: TITLE                                                      -->
@@ -2155,6 +2168,43 @@ function lessonTypewrite(html) {
 document.getElementById('lesson-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeLesson();
 });
+
+/* ── Fullscreen toggle ─────────────────────────────────────────── */
+function toggleFullscreen() {
+  var el = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+  }
+}
+function _updateFsBtn() {
+  var btn = document.getElementById('fs-btn');
+  if (!btn) return;
+  var active = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+  btn.innerHTML = active ? '&#x229F;' : '&#x26F6;';
+}
+document.addEventListener('fullscreenchange',       _updateFsBtn);
+document.addEventListener('webkitfullscreenchange', _updateFsBtn);
+document.addEventListener('mozfullscreenchange',    _updateFsBtn);
+
+/* ── Auto-fullscreen on first user gesture ─────────────────────── */
+(function() {
+  function _tryFS() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+      var el = document.documentElement;
+      (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || function(){}).call(el);
+    }
+  }
+  function _onGesture() {
+    _tryFS();
+    document.removeEventListener('click',   _onGesture, true);
+    document.removeEventListener('keydown', _onGesture, true);
+  }
+  _tryFS();
+  document.addEventListener('click',   _onGesture, true);
+  document.addEventListener('keydown', _onGesture, true);
+})();
 </script>
 </body>
 </html>
